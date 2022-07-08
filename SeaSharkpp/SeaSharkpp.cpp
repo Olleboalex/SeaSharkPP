@@ -12,7 +12,7 @@ using namespace std;
 int main()
 {
 	fstream file;
-	file.open("D:\\VisualStudioProjects\\SeaSharkpp\\x64\\Debug\\code.ss", ios::in);
+	file.open("D:\\VisualStudioProjects\\SeaSharkPLUSPLUS\\SeaSharkPP\\SeaSharkpp\\x64\\Debug\\code.ss", ios::in);
 	string code = "";
 	if (file.is_open())
 	{

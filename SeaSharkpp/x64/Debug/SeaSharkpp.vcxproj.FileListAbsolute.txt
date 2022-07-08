@@ -1,1 +1,2 @@
 D:\VisualStudioProjects\SeaSharkpp\x64\Debug\SeaSharkpp.exe
+D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\x64\Debug\SeaSharkpp.exe
