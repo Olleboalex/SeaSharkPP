@@ -1,0 +1,9 @@
+﻿  SeaSharkpp.cpp
+D:\VisualStudioProjects\SeaSharkpp\Tokens.h(11,26): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+D:\VisualStudioProjects\SeaSharkpp\Tokens.h(14,42): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
+D:\VisualStudioProjects\SeaSharkpp\Tokens.h(44,38): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+D:\VisualStudioProjects\SeaSharkpp\Tokens.h(48,37): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+D:\VisualStudioProjects\SeaSharkpp\Tokens.h(177,28): warning C4244: 'return': conversion from 'int' to 'float', possible loss of data
+D:\VisualStudioProjects\SeaSharkpp\ARITHMETICPARSING.h(18,21): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\VisualStudioProjects\SeaSharkpp\ARITHMETICPARSING.h(83,29): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+  SeaSharkpp.vcxproj -> D:\VisualStudioProjects\SeaSharkpp\x64\Debug\SeaSharkpp.exe
