@@ -9,6 +9,16 @@ int ParseInt(string val)
 {
 	int result = 0;
 	int valSize = val.size();
+	int multi = 1;
+	if (val[0] == '-')
+	{
+		for (int i = 0; i < valSize - 1; i++)
+		{
+			result -= (val[valSize - 1 - i] - '0') * pow(10, i);
+		}
+		return result;
+	}
+
 	for (int i = 0; i < valSize; i++)
 	{
 		result += (val[valSize - 1 - i] - '0') * pow(10, i);
@@ -22,6 +32,13 @@ float ParseFloat(string val)
 	string beforeDecimal = "";
 	string afterDecimal = "";
 	int i = 0;
+	int sign = 1;
+	// If number is negative ignore the first item
+	if (val[0] == '-')
+	{
+		sign = -1;
+		i = 1;
+	}
 	while (i < val.size())
 	{
 		if (val[i] == '.')
@@ -47,7 +64,7 @@ float ParseFloat(string val)
 	{
 		result += (afterDecimal[j] - '0') * pow(10, -(j + 1));
 	}
-	return result;
+	return result * sign;
 }
 
 bool IsDigit(char c)
@@ -119,11 +136,24 @@ struct Token
 			// If one found then float
 			// Otherwise int
 			int decimalsfound = 0;
+			bool Error = false;
 			for (int i = 0; i < numText.size(); i++)
 			{
 				if (numText[i] == '.')
 				{
 					decimalsfound++;
+				}
+				else if (i != 0 && !IsDigit(numText[i]))
+				{
+					ID = "ERROR";
+					NAME = "Cannot parse number";
+					return;
+				}
+				else if (i == 0 && !IsDigit(numText[0]) && numText[0] != '-')
+				{
+					ID = "ERROR";
+					NAME = "Cannot parse number";
+					return;
 				}
 			}
 			if (decimalsfound == 0)
@@ -138,7 +168,8 @@ struct Token
 			}
 			else
 			{
-				ID = "UNKNOWN";
+				ID = "ERROR";
+				NAME = "Cannot parse number";
 			}
 		}
 		Token(int intval)

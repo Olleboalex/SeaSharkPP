@@ -194,14 +194,21 @@ Token ParseArithmeticPARAN(vector<Token> tokens)
 
 Token ParseArithmetic(vector<Token> tokens, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
 {
-
 	vector<Token> resultTokens;
 	int cursor = 0;
 	while (cursor < tokens.size())
 	{
 		if (tokens[cursor].ID == "VAR")
 		{
-			resultTokens.push_back((*Variables)[tokens[cursor].NAME]);
+			Token tok = (*Variables)[tokens[cursor].NAME];
+			if (tok.ID != "INT" && tok.ID != "FLOAT")
+			{
+				Token errorTok;
+				errorTok.ID = "ERROR";
+				errorTok.NAME = "Cant do arithmetic on strings and numbers";
+				return errorTok;
+			}
+			resultTokens.push_back(tok);
 		}
 		else if (tokens[cursor].ID == "METHOD")
 		{
@@ -215,22 +222,44 @@ Token ParseArithmetic(vector<Token> tokens, unordered_map<string, method>* metho
 	}
 	return ParseArithmeticPARAN(resultTokens);
 }
+
 bool ParseBool(vector<Token> tokens, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
 {
 	if (tokens.size() == 1 && tokens[0].ID == "BOOL") return tokens[0].boolVal;
 	bool Equals = true;
+	string comparisor;
 	TOK LSide;
 	int cursor = 0;
 	while (cursor < tokens.size())
 	{
 		if (tokens[cursor].ID == "NOTEQUALS")
 		{
-			Equals = false;
+			comparisor = tokens[cursor].ID;
 			break;
 		}
 		else if (tokens[cursor].ID == "EQUALS")
 		{
-			Equals = true;
+			comparisor = tokens[cursor].ID;
+			break;
+		}
+		else if (tokens[cursor].ID == "BIGEQUALS")
+		{
+			comparisor = tokens[cursor].ID;
+			break;
+		}
+		else if (tokens[cursor].ID == "SMALLEQUALS")
+		{
+			comparisor = tokens[cursor].ID;
+			break;
+		}
+		else if (tokens[cursor].ID == "BIGGER")
+		{
+			comparisor = tokens[cursor].ID;
+			break;
+		}
+		else if (tokens[cursor].ID == "SMALLER")
+		{
+			comparisor = tokens[cursor].ID;
 			break;
 		}
 		LSide.push_back(tokens[cursor]);
@@ -243,6 +272,31 @@ bool ParseBool(vector<Token> tokens, unordered_map<string, method>* methods, uno
 		RSide.push_back(tokens[cursor]);
 		cursor++;
 	}
-	if (Equals) return ParseArithmetic(LSide, methods, Variables).GetTokenValueAsFloat() == ParseArithmetic(RSide, methods, Variables).GetTokenValueAsFloat();
-	return ParseArithmetic(LSide, methods, Variables).GetTokenValueAsFloat() != ParseArithmetic(RSide, methods, Variables).GetTokenValueAsFloat();
+
+	if (comparisor == "EQUALS")
+	{
+		return ParseArithmetic(LSide, methods, Variables).GetTokenValueAsFloat() == ParseArithmetic(RSide, methods, Variables).GetTokenValueAsFloat();
+	}
+	else if (comparisor == "NOTEQUALS")
+	{
+		return ParseArithmetic(LSide, methods, Variables).GetTokenValueAsFloat() != ParseArithmetic(RSide, methods, Variables).GetTokenValueAsFloat();
+	}
+	else if (comparisor == "BIGEQUALS")
+	{
+		return ParseArithmetic(LSide, methods, Variables).GetTokenValueAsFloat() >= ParseArithmetic(RSide, methods, Variables).GetTokenValueAsFloat();
+	}
+	else if (comparisor == "SMALLEQUALS")
+	{
+		return ParseArithmetic(LSide, methods, Variables).GetTokenValueAsFloat() <= ParseArithmetic(RSide, methods, Variables).GetTokenValueAsFloat();
+	}
+	else if (comparisor == "BIGGER")
+	{
+		return ParseArithmetic(LSide, methods, Variables).GetTokenValueAsFloat() > ParseArithmetic(RSide, methods, Variables).GetTokenValueAsFloat();
+	}
+	else if (comparisor == "SMALLER")
+	{
+		return ParseArithmetic(LSide, methods, Variables).GetTokenValueAsFloat() < ParseArithmetic(RSide, methods, Variables).GetTokenValueAsFloat();
+	}
+
+	return false;
 }

@@ -6,7 +6,7 @@
 
 using namespace std;
 
-unordered_set<char> mathOperators {'+', '-', '*', '/', '%', '(', ')', '=', '!'};
+unordered_set<char> mathOperators {'+', '-', '*', '/', '%', '(', ')', '=', '!', '>', '<'};
 
 vector<Token> LexText(string Text)
 {
@@ -29,28 +29,6 @@ vector<Token> LexText(string Text)
 		}
 		if (Text[cursor] != ' ' && Text[cursor] != '\n' && Text[cursor] != '\t')
 		{
-			/*if (cursor < Text.size() - 4 && Text[cursor] == 'p' && Text[cursor + 1] == 'r' && Text[cursor + 2] == 'i' && Text[cursor + 3] == 'n' && Text[cursor + 4] == 't')
-			{
-				cursor += 5;
-				int parans = 1;
-				while (Text[cursor] != '(')
-				{
-					cursor++;
-				}
-				cursor++;
-				string evalText = "";
-				while (cursor < Text.size())
-				{
-					if (Text[cursor] == '(') parans++;
-					if (Text[cursor] == ')') parans--;
-					if (parans == 0) break;
-					evalText += Text[cursor];
-					cursor++;
-				}
-				Token tok = Token("METHOD", vector<Token> {LexText(evalText)});
-				tok.NAME = "PRINT";
-				tokens.push_back(tok);
-			}*/
 			if (cursor < Text.size() - 1 && Text[cursor] == 'i' && Text[cursor + 1] == 'f')
 			{
 				cursor += 2;
@@ -85,6 +63,35 @@ vector<Token> LexText(string Text)
 					cursor++;
 				}
 				tokens.push_back(Token("IF", LexText(evalText), LexText(execText)));
+			}
+			else if (cursor < Text.size() - 3 && Text[cursor] == 'e' && Text[cursor + 1] == 'l' && Text[cursor + 2] == 's' && Text[cursor + 3] == 'e')
+			{
+				cursor += 3;
+				while (Text[cursor] != '{')
+				{
+					cursor++;
+					if (cursor >= Text.size())
+					{
+						//ERROR
+					}
+				}
+				cursor++;
+				int curlyBracks = 1;
+				string content = "";
+				while (cursor < Text.size())
+				{
+					if (Text[cursor] == '{') curlyBracks++;
+					if (Text[cursor] == '}') curlyBracks--;
+					if (curlyBracks == 0) break;
+
+					content += Text[cursor];
+					cursor++;
+				}
+
+				Token tok;
+				tok.ID = "ELSE";
+				tok.ExecStatement = LexText(content);
+				tokens.push_back(tok);
 			}
 			else if (cursor < Text.size() - 4 && Text[cursor] == 'w' && Text[cursor + 1] == 'h' && Text[cursor + 2] == 'i' && Text[cursor + 3] == 'l' && Text[cursor + 4] == 'e')
 			{
@@ -148,6 +155,32 @@ vector<Token> LexText(string Text)
 				cursor += 1;
 				Token tok = Token(0);
 				tok.ID = "EQUALS";
+				tokens.push_back(tok);
+			}
+			else if (cursor < Text.size() - 1 && Text[cursor] == '<' && Text[cursor + 1] == '=')
+			{
+				cursor += 1;
+				Token tok = Token(0);
+				tok.ID = "SMALLEQUALS";
+				tokens.push_back(tok);
+			}
+			else if (cursor < Text.size() - 1 && Text[cursor] == '>' && Text[cursor + 1] == '=')
+			{
+				cursor += 1;
+				Token tok = Token(0);
+				tok.ID = "BIGEQUALS";
+				tokens.push_back(tok);
+			}
+			else if (Text[cursor] == '<')
+			{
+				Token tok;
+				tok.ID = "SMALLER";
+				tokens.push_back(tok);
+			}
+			else if (Text[cursor] == '>')
+			{
+				Token tok;
+				tok.ID = "BIGGER";
 				tokens.push_back(tok);
 			}
 			else if (cursor < Text.size() - 5 && Text[cursor] == 'r' && Text[cursor + 1] == 'e' && Text[cursor + 2] == 't' && Text[cursor + 3] == 'u' && Text[cursor + 4] == 'r' && Text[cursor + 5] == 'n')
@@ -278,6 +311,88 @@ vector<Token> LexText(string Text)
 				tok.EvalStatement = vector<vector<Token>>{ LexText(setText) };
 				tokens.push_back(tok);
 			}
+			else if (cursor < Text.size() - 1 && Text[cursor] == '+' && Text[cursor + 1] == '+')
+			{
+				while (cursor < Text.size())
+				{
+					if (Text[cursor] == '\n') break;
+					cursor++;
+				}
+				Token tok;
+				tok.ID = "INCREMENT";
+				tokens.push_back(tok);
+			}
+			else if (cursor < Text.size() - 1 && Text[cursor] == '-' && Text[cursor + 1] == '-')
+			{
+				while (cursor < Text.size())
+				{
+					if (Text[cursor] == '\n') break;
+					cursor++;
+				}
+				Token tok;
+				tok.ID = "DECREMENT";
+				tokens.push_back(tok);
+			}
+			else if (cursor < Text.size() - 1 && Text[cursor] == '+' && Text[cursor + 1] == '=')
+			{
+				cursor += 2;
+				string content;
+				while (cursor < Text.size())
+				{
+					if (Text[cursor] == '\n') break;
+					content += Text[cursor];
+					cursor++;
+				}
+				Token tok;
+				tok.ID = "PLUSEQUALS";
+				tok.EvalStatement = vector<vector<Token>>{ LexText(content) };
+				tokens.push_back(tok);
+			}
+			else if (cursor < Text.size() - 1 && Text[cursor] == '-' && Text[cursor + 1] == '=')
+			{
+				cursor += 2;
+				string content;
+				while (cursor < Text.size())
+				{
+					if (Text[cursor] == '\n') break;
+					content += Text[cursor];
+					cursor++;
+				}
+				Token tok;
+				tok.ID = "MINUSEQUALS";
+				tok.EvalStatement = vector<vector<Token>>{ LexText(content) };
+				tokens.push_back(tok);
+			}
+			else if (cursor < Text.size() - 1 && Text[cursor] == '*' && Text[cursor + 1] == '=')
+			{
+				cursor += 2;
+				string content;
+				while (cursor < Text.size())
+				{
+					if (Text[cursor] == '\n') break;
+					content += Text[cursor];
+					cursor++;
+				}
+				Token tok;
+				tok.ID = "MULTIPLYEQUALS";
+				tok.EvalStatement = vector<vector<Token>>{ LexText(content) };
+				tokens.push_back(tok);
+			}
+			else if (cursor < Text.size() - 1 && Text[cursor] == '/' && Text[cursor + 1] == '=')
+			{
+				cursor += 2;
+				string content;
+				while (cursor < Text.size())
+				{
+					if (Text[cursor] == '\n') break;
+					content += Text[cursor];
+					cursor++;
+				}
+				Token tok;
+				tok.ID = "DIVIDEEQUALS";
+				tok.EvalStatement = vector<vector<Token>>{ LexText(content) };
+				tokens.push_back(tok);
+			}
 			else if (Text[cursor] == '#')
 			{
 				while (cursor < Text.size())
@@ -290,7 +405,22 @@ vector<Token> LexText(string Text)
 			{
 				if (IsDigit(Text[cursor]) || mathOperators.count(Text[cursor]))
 				{
-					tokens.push_back(Token(Text[cursor]));
+					if (cursor < Text.size() - 1 && Text[cursor] == '-' && IsDigit(Text[cursor + 1]))
+					{
+						string temp = "";
+						while (cursor < Text.size())
+						{
+							if (!IsDigit(Text[cursor]) && Text[cursor] != '.' && Text[cursor] != '-') break;
+							temp += Text[cursor];
+							cursor++;
+						}
+						tokens.push_back(Token(temp));
+						if (cursor >= Text.size()) break;
+					}
+					else
+					{
+						tokens.push_back(Token(Text[cursor]));
+					}
 				}
 				else
 				{

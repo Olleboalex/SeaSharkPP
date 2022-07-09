@@ -1,9 +1,11 @@
 ﻿  SeaSharkpp.cpp
 D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\Tokens.h(11,26): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\Tokens.h(14,42): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
-D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\Tokens.h(44,38): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
-D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\Tokens.h(48,37): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
-D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\Tokens.h(177,28): warning C4244: 'return': conversion from 'int' to 'float', possible loss of data
+D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\Tokens.h(17,43): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
+D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\Tokens.h(24,42): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
+D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\Tokens.h(61,38): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\Tokens.h(65,37): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\Tokens.h(208,28): warning C4244: 'return': conversion from 'int' to 'float', possible loss of data
 D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\ARITHMETICPARSING.h(18,21): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
 D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\ARITHMETICPARSING.h(83,29): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\Parser.h(130,16): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
   SeaSharkpp.vcxproj -> D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\x64\Debug\SeaSharkpp.exe

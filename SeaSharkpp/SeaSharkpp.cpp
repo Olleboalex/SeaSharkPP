@@ -9,11 +9,12 @@
 
 using namespace std;
 
+string codePath = "D:\\VisualStudioProjects\\SeaSharkPLUSPLUS\\SeaSharkPP\\SeaSharkpp\\x64\\Debug\\code.ss";
+
 int main()
 {
 	fstream file;
-	file.open("D:\\VisualStudioProjects\\SeaSharkPLUSPLUS\\SeaSharkPP\\SeaSharkpp\\x64\\Debug\\code.ss", ios::in);
-	//file.open(".\\code.ss", ios::in);
+	file.open(codePath, ios::in);
 	string code = "";
 	if (file.is_open())
 	{
@@ -28,10 +29,9 @@ int main()
 	vector<Token> tokens = LexText(code);
 
 	Token runToken = Parse(tokens, &METHODS, &VARIABLES);
+
 	if (runToken.ID == "ERROR")
 	{
 		cout << "Error: " + runToken.NAME;
 	}
-
-	cin.get();
 }
