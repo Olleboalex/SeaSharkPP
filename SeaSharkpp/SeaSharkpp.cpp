@@ -27,8 +27,6 @@ int main()
 
 	vector<Token> tokens = LexText(code);
 
-	unordered_map<string, method> METHODS;
-	unordered_map<string, Token> VARIABLES;
 	Token runToken = Parse(tokens, &METHODS, &VARIABLES);
 	if (runToken.ID == "ERROR")
 	{

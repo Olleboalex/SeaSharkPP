@@ -65,7 +65,7 @@ struct Token
 		bool boolVal;
 		string stringVal;
 		string NAME;
-		vector<Token> EvalStatement;
+		vector<vector<Token>> EvalStatement;
 		vector<Token> ExecStatement;
 
 		// Input is single char operator
@@ -164,12 +164,12 @@ struct Token
 		Token(string id, vector<Token> evalToks)
 		{
 			ID = id;
-			EvalStatement = evalToks;
+			EvalStatement = vector<vector<Token>>{ evalToks };
 		}		
 		Token(string id, vector<Token> evalToks, vector<Token> execToks)
 		{
 			ID = id;
-			EvalStatement = evalToks;
+			EvalStatement = vector<vector<Token>>{ evalToks };
 			ExecStatement = execToks;
 		}
 		float GetTokenValueAsFloat()
@@ -183,16 +183,26 @@ struct method
 {
 	public:
 		string Name;
-		vector<Token> Parameters;
+		vector<vector<Token>> Parameters;
 		vector<Token> ExecutionStatements;
-		method(string name, vector<Token> params, vector<Token> exec)
+		bool SystemMethod;
+		method(string name, vector<vector<Token>> params, vector<Token> exec)
 		{
 			Name = name;
 			Parameters = params;
 			ExecutionStatements = exec;
+			SystemMethod = false;
+		}
+		method(string name, vector<vector<Token>> params, vector<Token> exec, bool systemMethod)
+		{
+			Name = name;
+			Parameters = params;
+			ExecutionStatements = exec;
+			SystemMethod = systemMethod;
 		}
 		method()
 		{
 			Name = "";
+			SystemMethod = false;
 		}
 };

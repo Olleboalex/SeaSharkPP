@@ -11,6 +11,40 @@ using namespace std;
 
 unordered_set<string> MathIDS{ "PLUS", "MINUS", "MULTIPLY", "DIVIDE", "MOD", "LPAR", "RPAR", "RCURLBRACK", "LCURLBRACK", "EQUALS", "NOTEQUALS"};
 
+unordered_map<string, method> METHODS = {
+	make_pair("print", method("print", vector<vector<Token>> {vector<Token>()}, vector<Token>(), true)),
+	make_pair("read", method("read", vector<vector<Token>>(), vector<Token>(), true))
+};
+unordered_map<string, Token> VARIABLES;
+
+Token SystemMethod(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+{
+	if (MethodCall.NAME == "print")
+	{
+		Token result = Parse(MethodCall.EvalStatement[0], methods, Variables);
+		if (result.ID == "FLOAT" || result.ID == "INT")
+		{
+			cout << result.GetTokenValueAsFloat() << endl;
+		}
+		else if (result.ID == "STRING")
+		{
+			cout << result.stringVal << endl;
+		}
+		else if (result.ID == "ERROR")
+		{
+			return result;
+		}
+	}
+	else if (MethodCall.NAME == "read")
+	{
+		Token tok;
+		tok.ID = "FLOAT";
+		cin >> tok.floatVal;
+		return tok;
+	}
+	return Token();
+}
+
 Token ParseLib(vector<Token> tokens, unordered_map<string, method>* methods)
 {
 	int cursor = 0;
@@ -64,23 +98,7 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 	int cursor = 0;
 	while (cursor < tokens.size())
 	{
-		if (tokens[cursor].ID == "PRINT")
-		{
-			Token result = Parse(tokens[cursor].EvalStatement, methods, Variables);
-			if (result.ID == "FLOAT" || result.ID == "INT")
-			{
-				cout << result.GetTokenValueAsFloat() << endl;
-			}
-			else if(result.ID == "STRING")
-			{
-				cout << result.stringVal << endl;
-			}
-			else if (result.ID == "ERROR")
-			{
-				return result;
-			}
-		}
-		else if (tokens[cursor].ID == "USING")
+		if (tokens[cursor].ID == "USING")
 		{
 			fstream lib;
 			string path = ".\\" + tokens[cursor].NAME + ".ssl";
@@ -108,7 +126,7 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 		}
 		else if (tokens[cursor].ID == "IF")
 		{
-			if (ParseBool(tokens[cursor].EvalStatement, methods, Variables))
+			if (ParseBool(tokens[cursor].EvalStatement[0], methods, Variables))
 			{
 				Token tok = Parse(tokens[cursor].ExecStatement, methods, Variables);
 				if (tok.ID != "NORETURN") return tok;
@@ -116,12 +134,12 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 		}
 		else if (tokens[cursor].ID == "WHILE")
 		{
-			bool run = ParseBool(tokens[cursor].EvalStatement, methods, Variables);
+			bool run = ParseBool(tokens[cursor].EvalStatement[0], methods, Variables);
 			while (run)
 			{
 				Token tok = Parse(tokens[cursor].ExecStatement, methods, Variables);
 				if (tok.ID != "NORETURN") return tok;
-				run = ParseBool(tokens[cursor].EvalStatement, methods, Variables);
+				run = ParseBool(tokens[cursor].EvalStatement[0], methods, Variables);
 			}
 		}
 		else if (tokens[cursor].ID == "DEFINITION")
@@ -139,7 +157,7 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 		}
 		else if (tokens[cursor].ID == "SETEQUALS")
 		{
-			Token tok = Parse(tokens[cursor].EvalStatement, methods, Variables);
+			Token tok = Parse(tokens[cursor].EvalStatement[0], methods, Variables);
 			(*Variables)[tokens[cursor - 1].NAME] = tok;
 		}
 		else if (tokens[cursor].ID == "METHOD")
@@ -158,30 +176,40 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 				errorToken.NAME = "Incorrect number of parameters in function call";
 				return errorToken;
 			}
-			unordered_map<string, Token> funcVariables = (*Variables);
-			for (int i = 0; i < (*methods)[tokens[cursor].NAME].Parameters.size(); i++)
+
+			if ((*methods)[tokens[cursor].NAME].SystemMethod)
 			{
-				vector<Token> token = { tokens[cursor].EvalStatement[i] };
-				funcVariables[(*methods)[tokens[cursor].NAME].Parameters[i].NAME] = Parse(token, methods, Variables);
+				Token tok = SystemMethod(tokens[cursor], methods, Variables);
+				if (tok.ID == "ERROR") return tok;
+				if (tokens.size() == 1) return tok;
 			}
-			Token tok = Parse((*methods)[tokens[cursor].NAME].ExecutionStatements, methods, &funcVariables);
-			for (int i = 0; i < (*methods)[tokens[cursor].NAME].Parameters.size(); i++)
+			else
 			{
-				if ((*Variables).count((*methods)[tokens[cursor].NAME].Parameters[i].NAME))
+				unordered_map<string, Token> funcVariables = VARIABLES;
+				for (int i = 0; i < (*methods)[tokens[cursor].NAME].Parameters.size(); i++)
 				{
-					funcVariables[(*methods)[tokens[cursor].NAME].Parameters[i].NAME] = (*Variables)[(*methods)[tokens[cursor].NAME].Parameters[i].NAME];
+					vector<Token> token = { tokens[cursor].EvalStatement[i] };
+					funcVariables[(*methods)[tokens[cursor].NAME].Parameters[i][0].NAME] = Parse(token, methods, Variables);
 				}
-				else
+				Token tok = Parse((*methods)[tokens[cursor].NAME].ExecutionStatements, methods, &funcVariables);
+				for (int i = 0; i < (*methods)[tokens[cursor].NAME].Parameters.size(); i++)
 				{
-					funcVariables.erase((*methods)[tokens[cursor].NAME].Parameters[i].NAME);
+					if (VARIABLES.count((*methods)[tokens[cursor].NAME].Parameters[i][0].NAME))
+					{
+						funcVariables[(*methods)[tokens[cursor].NAME].Parameters[i][0].NAME] = VARIABLES[(*methods)[tokens[cursor].NAME].Parameters[i][0].NAME];
+					}
+					else
+					{
+						funcVariables.erase((*methods)[tokens[cursor].NAME].Parameters[i][0].NAME);
+					}
 				}
+				VARIABLES = funcVariables;
+				if (tokens.size() == 1) return tok;
 			}
-			(*Variables) = funcVariables;
-			if(tokens.size() == 1) return tok;
 		}
 		else if (tokens[cursor].ID == "RETURN")
 		{
-			return Parse(tokens[cursor].EvalStatement, methods, Variables);
+			return Parse(tokens[cursor].EvalStatement[0], methods, Variables);
 		}
 		else if (tokens[cursor].ID == "FLOAT" || tokens[cursor].ID == "INT")
 		{
