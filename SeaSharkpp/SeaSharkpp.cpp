@@ -13,6 +13,7 @@ int main()
 {
 	fstream file;
 	file.open("D:\\VisualStudioProjects\\SeaSharkPLUSPLUS\\SeaSharkPP\\SeaSharkpp\\x64\\Debug\\code.ss", ios::in);
+	//file.open(".\\code.ss", ios::in);
 	string code = "";
 	if (file.is_open())
 	{
@@ -25,7 +26,14 @@ int main()
 	}
 
 	vector<Token> tokens = LexText(code);
+
 	unordered_map<string, method> METHODS;
 	unordered_map<string, Token> VARIABLES;
-	Parse(tokens, &METHODS, &VARIABLES);
+	Token runToken = Parse(tokens, &METHODS, &VARIABLES);
+	if (runToken.ID == "ERROR")
+	{
+		cout << "Error: " + runToken.NAME;
+	}
+
+	cin.get();
 }

@@ -1,0 +1,51 @@
+# Defines the factorial of x
+def Factorial(x)
+{
+	result = 1.0
+	i = 2
+	while(i != x + 1)
+	{
+		result = result * i
+		i = i + 1
+	}
+	return result
+}
+
+# Defines exponents on integers
+def intPow(b, y)
+{
+	resulttt = 1.0
+	k = 0
+	while(k != y)
+	{
+		resulttt = resulttt * b
+		k = k + 1
+	}
+	return resulttt
+}
+
+# Input is in radians
+# Uses a taylor series to approximate sin(x) through 20 iterations
+def sin(g)
+{
+	resultt = 0.0
+	j = 0
+	while(j != 20)
+	{
+		num = 2 * j + 1
+
+		diff = intPow(g, num) / Factorial(num)
+
+		if(j % 2 == 0)
+		{
+			resultt = resultt + diff
+		}
+		if(j % 2 == 1)
+		{
+			resultt = resultt - diff
+		}
+		print(j)
+		j = j + 1
+	}
+	return resultt
+}

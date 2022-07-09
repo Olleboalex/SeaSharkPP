@@ -196,7 +196,7 @@ vector<Token> LexText(string Text)
 					}
 					else
 					{
-						paramText += Text[cursor];
+						if(Text[cursor] != ' ') paramText += Text[cursor];
 					}
 					cursor++;
 				}
@@ -224,6 +224,26 @@ vector<Token> LexText(string Text)
 				tok.EvalStatement = params;
 				tok.ExecStatement = LexText(execText);
 				tok.NAME = name;
+				tokens.push_back(tok);
+			}
+			else if (cursor < Text.size() - 4 && Text[cursor] == 'u' && Text[cursor + 1] == 's' && Text[cursor + 2] == 'i' && Text[cursor + 3] == 'n' && Text[cursor + 4] == 'g')
+			{
+				cursor += 5;
+				while (Text[cursor] == ' ')
+				{
+					cursor++;
+				}
+				string LibraryName;
+				while (cursor < Text.size())
+				{
+					if (Text[cursor] == ' ') break;
+					if (Text[cursor] == '\n') break;
+					LibraryName += Text[cursor];
+					cursor++;
+				}
+				Token tok;
+				tok.ID = "USING";
+				tok.NAME = LibraryName;
 				tokens.push_back(tok);
 			}
 			else if (Text[cursor] == '"')
@@ -255,6 +275,14 @@ vector<Token> LexText(string Text)
 				tok.ID = "SETEQUALS";
 				tok.EvalStatement = LexText(setText);
 				tokens.push_back(tok);
+			}
+			else if (Text[cursor] == '#')
+			{
+				while (cursor < Text.size())
+				{
+					if (Text[cursor] == '\n') break;
+					cursor++;
+				}
 			}
 			else
 			{
@@ -303,7 +331,10 @@ vector<Token> LexText(string Text)
 							}
 							else
 							{
-								paramText += Text[cursor];
+								if (Text[cursor] != ' ')
+								{
+									paramText += Text[cursor];
+								}
 							}
 							cursor++;
 						}
@@ -314,7 +345,7 @@ vector<Token> LexText(string Text)
 						Token tok = Token(0);
 						tok.ID = "METHOD";
 						tok.NAME = name;
-						tok.EvalStatement = LexText(paramText);
+						tok.EvalStatement = params;
 						tokens.push_back(tok);
 					}
 					else

@@ -7,7 +7,7 @@
 
 using namespace std;
 
-Token Parse(vector<Token> tokens, unordered_map<string, method> methods, unordered_map<string, Token> Variables);
+Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables);
 
 Token ParseArithmeticPLUSMINUS(vector<Token> tokens)
 {
@@ -203,10 +203,10 @@ Token ParseArithmetic(vector<Token> tokens, unordered_map<string, method>* metho
 		{
 			resultTokens.push_back((*Variables)[tokens[cursor].NAME]);
 		}
-		/*else if (tokens[cursor].ID == "METHOD")
+		else if (tokens[cursor].ID == "METHOD")
 		{
 			resultTokens.push_back(Parse((*methods)[tokens[cursor].NAME].ExecutionStatements, methods, Variables));
-		}*/
+		}
 		else
 		{
 			resultTokens.push_back(tokens[cursor]);
