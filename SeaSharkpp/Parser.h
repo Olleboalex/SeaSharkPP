@@ -21,7 +21,8 @@ unordered_map<string, method> METHODS = {
 	make_pair("print", method("print", vector<vector<Token>> {vector<Token>()}, vector<Token>(), true)),
 	make_pair("printline", method("printline", vector<vector<Token>> {vector<Token>()}, vector<Token>(), true)),
 	make_pair("read", method("read", vector<vector<Token>>(), vector<Token>(), true)),
-	make_pair("num", method("num", vector<vector<Token>> {vector<Token>()}, vector<Token>(), true)),
+	make_pair("int", method("int", vector<vector<Token>> {vector<Token>()}, vector<Token>(), true)),
+	make_pair("float", method("float", vector<vector<Token>> {vector<Token>()}, vector<Token>(), true)),
 	make_pair("random", method("random", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), true))
 };
 unordered_map<string, Token> VARIABLES;
@@ -85,13 +86,13 @@ Token SystemMethod(Token MethodCall, unordered_map<string, method>* methods, uno
 		cin >> tok.stringVal;
 		return tok;
 	}
-	else if (MethodCall.NAME == "num")
+	else if (MethodCall.NAME == "int")
 	{
 		if (MethodCall.EvalStatement.size() != 1 || MethodCall.EvalStatement[0].size() != 1)
 		{
 			Token errorTok;
 			errorTok.ID = "ERROR";
-			errorTok.NAME = "Incorrect input in num() method call";
+			errorTok.NAME = "Incorrect input in int() method call";
 		}
 		Token tok = MethodCall.EvalStatement[0][0];
 		if (MethodCall.EvalStatement[0][0].ID == "VAR")
@@ -106,13 +107,62 @@ Token SystemMethod(Token MethodCall, unordered_map<string, method>* methods, uno
 		if (tok.ID == "STRING")
 		{
 			Token token = Token(tok.stringVal);
+			token.intVal = static_cast<int>(token.GetTokenValueAsFloat());
+			token.ID = "INT";
+			return token;
+		}
+		else if (tok.ID == "FLOAT" || tok.ID == "INT")
+		{
+			Token token;
+			token.ID = "INT";
+			token.intVal = static_cast<int>(tok.GetTokenValueAsFloat());
 			return token;
 		}
 		else
 		{
 			Token errorTok;
 			errorTok.ID = "ERROR";
-			errorTok.NAME = "Input must be of type string";
+			errorTok.NAME = "Input must be of type string or float";
+			return errorTok;
+		}
+	}
+	else if (MethodCall.NAME == "float")
+	{
+		if (MethodCall.EvalStatement.size() != 1 || MethodCall.EvalStatement[0].size() != 1)
+		{
+			Token errorTok;
+			errorTok.ID = "ERROR";
+			errorTok.NAME = "Incorrect input in float() method call";
+		}
+		Token tok = MethodCall.EvalStatement[0][0];
+		if (MethodCall.EvalStatement[0][0].ID == "VAR")
+		{
+			tok = (*Variables)[MethodCall.EvalStatement[0][0].NAME];
+		}
+		else if (MethodCall.EvalStatement[0][0].ID == "METHOD")
+		{
+			tok = Parse(MethodCall.EvalStatement[0], methods, Variables);
+		}
+
+		if (tok.ID == "STRING")
+		{
+			Token token = Token(tok.stringVal);
+			token.floatVal = token.GetTokenValueAsFloat();
+			token.ID = "FLOAT";
+			return token;
+		}
+		else if (tok.ID == "INT" || tok.ID == "FLOAT")
+		{
+			Token token;
+			token.ID = "FLOAT";
+			token.floatVal = tok.GetTokenValueAsFloat();
+			return token;
+		}
+		else
+		{
+			Token errorTok;
+			errorTok.ID = "ERROR";
+			errorTok.NAME = "Input must be of type string, int or float";
 			return errorTok;
 		}
 	}
@@ -212,6 +262,75 @@ Token ParseLib(vector<Token> tokens, unordered_map<string, method>* methods)
 	return Token(0);
 }
 
+bool CheckIfNameIsContained(vector<vector<Token>> x, string name)
+{
+	for (int i = 0; i < x.size(); i++)
+	{
+		if (x[i][0].NAME == name) return true;
+	}
+	return false;
+}
+
+Token ParseMethodCall(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+{
+	if (!(*methods).count(MethodCall.NAME))
+	{
+		Token errorToken;
+		errorToken.ID = "ERROR";
+		errorToken.NAME = "Function does not exist";
+		return errorToken;
+	}
+	if ((*methods)[MethodCall.NAME].Parameters.size() != MethodCall.EvalStatement.size())
+	{
+		Token errorToken;
+		errorToken.ID = "ERROR";
+		errorToken.NAME = "Incorrect number of parameters in function call";
+		return errorToken;
+	}
+
+	if ((*methods)[MethodCall.NAME].SystemMethod)
+	{
+		Token tok = SystemMethod(MethodCall, methods, Variables);
+		return tok;
+	}
+	else
+	{
+		unordered_map<string, Token> funcVariables = VARIABLES;
+		for (int i = 0; i < (*methods)[MethodCall.NAME].Parameters.size(); i++)
+		{
+			vector<Token> token = { MethodCall.EvalStatement[i] };
+			funcVariables[(*methods)[MethodCall.NAME].Parameters[i][0].NAME] = Parse(token, methods, Variables);
+		}
+		Token tok = Parse((*methods)[MethodCall.NAME].ExecutionStatements, methods, &funcVariables);
+		/*for (int i = 0; i < (*methods)[MethodCall.NAME].Parameters.size(); i++)
+		{
+			if (VARIABLES.count((*methods)[MethodCall.NAME].Parameters[i][0].NAME))
+			{
+				funcVariables[(*methods)[MethodCall.NAME].Parameters[i][0].NAME] = VARIABLES[(*methods)[MethodCall.NAME].Parameters[i][0].NAME];
+			}
+			else
+			{
+				funcVariables.erase((*methods)[MethodCall.NAME].Parameters[i][0].NAME);
+			}
+		}*/
+		for (pair<string, Token> element : funcVariables)
+		{
+			if (VARIABLES.count(element.first))
+			{
+				if (!CheckIfNameIsContained((*methods)[MethodCall.NAME].Parameters, element.first))
+				{
+					VARIABLES[element.first] = element.second;
+				}
+			}
+			else
+			{
+				//funcVariables.erase(element.first);
+			}
+		}
+		//VARIABLES = funcVariables;
+		return tok;
+	}
+}
 
 Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
 {
@@ -275,7 +394,8 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 			while (run)
 			{
 				Token tok = Parse(tokens[cursor].ExecStatement, methods, Variables);
-				if (tok.ID != "NORETURN") return tok;
+				//if (tok.ID != "NORETURN") return tok;
+				if (tok.ID == "ERROR") return tok;
 				run = ParseBool(tokens[cursor].EvalStatement[0], methods, Variables);
 			}
 		}
@@ -295,6 +415,7 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 		else if (tokens[cursor].ID == "SETEQUALS")
 		{
 			Token tok = Parse(tokens[cursor].EvalStatement[0], methods, Variables);
+
 			if (tok.ID == "ERROR") return tok;
 
 			if (cursor > 0 && tokens[cursor - 1].ID == "VAR")
@@ -332,7 +453,7 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 					if (tok.ID == "FLOAT")
 					{
 						(*Variables)[tokens[cursor - 1].NAME].ID = "FLOAT";
-						(*Variables)[tokens[cursor - 1].NAME].floatVal += tok.floatVal;
+						(*Variables)[tokens[cursor - 1].NAME].floatVal = (*Variables)[tokens[cursor - 1].NAME].intVal + tok.floatVal;
 					}
 					else
 					{
@@ -378,7 +499,7 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 					if (tok.ID == "FLOAT")
 					{
 						(*Variables)[tokens[cursor - 1].NAME].ID = "FLOAT";
-						(*Variables)[tokens[cursor - 1].NAME].floatVal -= tok.floatVal;
+						(*Variables)[tokens[cursor - 1].NAME].floatVal = (*Variables)[tokens[cursor - 1].NAME].intVal - tok.floatVal;
 					}
 					else
 					{
@@ -424,7 +545,7 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 					if (tok.ID == "FLOAT")
 					{
 						(*Variables)[tokens[cursor - 1].NAME].ID = "FLOAT";
-						(*Variables)[tokens[cursor - 1].NAME].floatVal *= tok.floatVal;
+						(*Variables)[tokens[cursor - 1].NAME].floatVal = (*Variables)[tokens[cursor - 1].NAME].intVal * tok.floatVal;
 					}
 					else
 					{
@@ -470,7 +591,7 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 					if (tok.ID == "FLOAT")
 					{
 						(*Variables)[tokens[cursor - 1].NAME].ID = "FLOAT";
-						(*Variables)[tokens[cursor - 1].NAME].floatVal /= tok.floatVal;
+						(*Variables)[tokens[cursor - 1].NAME].floatVal = (*Variables)[tokens[cursor - 1].NAME].intVal / tok.floatVal;
 					}
 					else
 					{
@@ -551,51 +672,9 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 		}
 		else if (tokens[cursor].ID == "METHOD")
 		{
-			if (!(*methods).count(tokens[cursor].NAME))
-			{
-				Token errorToken;
-				errorToken.ID = "ERROR";
-				errorToken.NAME = "Function does not exist";
-				return errorToken;
-			}
-			if ((*methods)[tokens[cursor].NAME].Parameters.size() != tokens[cursor].EvalStatement.size())
-			{
-				Token errorToken;
-				errorToken.ID = "ERROR";
-				errorToken.NAME = "Incorrect number of parameters in function call";
-				return errorToken;
-			}
-
-			if ((*methods)[tokens[cursor].NAME].SystemMethod)
-			{
-				Token tok = SystemMethod(tokens[cursor], methods, Variables);
-				if (tok.ID == "ERROR") return tok;
-				if (tokens.size() == 1) return tok;
-			}
-			else
-			{
-				unordered_map<string, Token> funcVariables = VARIABLES;
-				for (int i = 0; i < (*methods)[tokens[cursor].NAME].Parameters.size(); i++)
-				{
-					vector<Token> token = { tokens[cursor].EvalStatement[i] };
-					funcVariables[(*methods)[tokens[cursor].NAME].Parameters[i][0].NAME] = Parse(token, methods, Variables);
-				}
-				Token tok = Parse((*methods)[tokens[cursor].NAME].ExecutionStatements, methods, &funcVariables);
-				for (int i = 0; i < (*methods)[tokens[cursor].NAME].Parameters.size(); i++)
-				{
-					if (VARIABLES.count((*methods)[tokens[cursor].NAME].Parameters[i][0].NAME))
-					{
-						funcVariables[(*methods)[tokens[cursor].NAME].Parameters[i][0].NAME] = VARIABLES[(*methods)[tokens[cursor].NAME].Parameters[i][0].NAME];
-					}
-					else
-					{
-						funcVariables.erase((*methods)[tokens[cursor].NAME].Parameters[i][0].NAME);
-					}
-				}
-				VARIABLES = funcVariables;
-				if (tok.ID == "ERROR") return tok;
-				if (tokens.size() == 1) return tok;
-			}
+			Token tok = ParseMethodCall(tokens[cursor], methods, Variables);
+			if (tok.ID == "ERROR") return tok;
+			if (tokens.size() == 1) return tok;
 		}
 		else if (tokens[cursor].ID == "RETURN")
 		{

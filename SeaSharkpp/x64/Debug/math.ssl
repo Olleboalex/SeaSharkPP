@@ -25,64 +25,167 @@ def intPow(x, y)
 }
 
 # Input is in radians
-# Uses the taylor series for sin(x) to approximate it with 15 iterations
+# Uses the taylor series for sin(x) to approximate it with 5 iterations
 def sin(x)
 {
 	Tao = 2 * PI()
 	while(x < 0)
 	{
-		x = x + Tao
+		x += Tao
 	}
+
 	while(x > Tao)
 	{
-		x = x - Tao
+		x -= Tao
 	}
-	halfpi = PI() / 2
 	multi = 1
 	if(x >= PI())
 	{
 		multi = -1
-		x = x - PI()
+		x -= PI()
 	}
 	if(x < PI())
 	{
-		if(x > halfpi)
+		if(x > PI() / 2)
 		{
 			x = PI() - x
 		}
 	}
 	result = 0
 	i = 0
-	while(i < 15)
+	while(i < 5)
 	{
 		oddNum = 2 * i + 1
-		pow = intPow(x, oddNum)
-		fact = Factorial(oddNum)
-		diff = pow / fact
-
+		diff = intPow(x, oddNum) / Factorial(oddNum)
 		if(i % 2 == 0)
 		{
-			result = result + diff
+			result += diff
 		}
 		else
 		{
-			result = result - diff
+			result -= diff
 		}
 		i++
 	}
 	return result * multi
 }
 
-def PI()
+# Input is in radians
+# Uses the taylor series for cos(x) to approximate it with 5 iterations
+def cos(x)
 {
-	return 3.14159265358979323846264338
+	Tao = 2 * PI()
+	while(x < 0)
+	{
+		x += Tao
+	}
+	while(x >= Tao)
+	{
+		x -= Tao
+	}
+	multi = 1
+	if(x > PI() / 2)
+	{
+		if(x < 2 * PI() / 3)
+		{
+			multi = -1
+		}
+	}
+
+	if(x > PI())
+	{
+		x = Tao - x
+	}
+
+	result = 1
+	i = 1
+	while(i < 5)
+	{
+		num = 2 * i
+		diff = intPow(x, num) / Factorial(num)
+		if(i % 2 == 0)
+		{
+			result += diff
+		}
+		else
+		{
+			result -= diff
+		}
+		i++
+	}
+	return result
 }
 
+# Input is in radians
+# Ouputs tan(x)
+def tan(x)
+{
+	return sin(x) / cos(x)
+}
+
+# returns output in radians
+# Uses arcsin(x) taylor series with 20 iterations
+def arcsin(x)
+{
+	result = x
+	i = 1
+	multiplicand = 1
+	num = 1.0
+
+	while(i < 21)
+	{
+		multiplicand = multiplicand * num / (num + 1)
+		oddNum = 2 * i + 1
+		result += intPow(x, oddNum) / oddNum * multiplicand
+		num += 2
+		i++
+	}
+	return result
+}
+
+# returns output in radians
+def arccos(x)
+{
+	return PI() / 2 - arcsin(x)
+}
+
+# returns output in radians
+# Uses taylor series for arctan(x) with 20 iterations
+def arctan(x)
+{
+	result = 0
+	i = 0
+	while(i < 20)
+	{
+		oddNum = 2 * i + 1
+		if(i % 2 == 0)
+		{
+			result += intPow(x, oddNum) / oddNum
+		}
+		else
+		{
+			result -= intPow(x, oddNum) / oddNum
+		}
+		i++
+	}
+	return result
+}
+
+# Returns an approximation of pi
+def PI()
+{
+	return 3.14159265
+}
+
+# Input is in degrees
+# Converts input to radians
 def ToRad(x)
 {
 	return x * PI() / 180
 }
 
+# Input is in radians
+# Converts input to degrees
 def ToDegrees(x)
 {
 	return x * 180 / PI()
