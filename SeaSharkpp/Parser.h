@@ -17,13 +17,15 @@ unordered_set<string> MathIDS{
 	"DECREMENT", "PLUSEQUALS", "MINUSEQUALS", "MULTIPLYEQUALS", "DIVIDEEQUALS"
 };
 
-unordered_map<string, method> METHODS = {
+unordered_map<string, method> METHODS{
 	make_pair("print", method("print", vector<vector<Token>> {vector<Token>()}, vector<Token>(), true)),
 	make_pair("printline", method("printline", vector<vector<Token>> {vector<Token>()}, vector<Token>(), true)),
 	make_pair("read", method("read", vector<vector<Token>>(), vector<Token>(), true)),
 	make_pair("int", method("int", vector<vector<Token>> {vector<Token>()}, vector<Token>(), true)),
 	make_pair("float", method("float", vector<vector<Token>> {vector<Token>()}, vector<Token>(), true)),
-	make_pair("random", method("random", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), true))
+	make_pair("random", method("random", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), true)),
+	make_pair("append", method("append", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), true)),
+	make_pair("get", method("get", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), true))
 };
 unordered_map<string, Token> VARIABLES;
 
@@ -206,6 +208,192 @@ Token SystemMethod(Token MethodCall, unordered_map<string, method>* methods, uno
 			Token errorToken;
 			errorToken.ID = "ERROR";
 			errorToken.NAME = "Incorrect number of inputs in random() function call";
+			return errorToken;
+		}
+	}
+	else if (MethodCall.NAME == "append")
+	{
+		if (MethodCall.EvalStatement[0].size() == 1 && MethodCall.EvalStatement[1].size() == 1)
+		{
+			if (MethodCall.EvalStatement[0][0].ID == "VAR")
+			{
+				if ((*Variables).count(MethodCall.EvalStatement[0][0].NAME))
+				{
+					Token varTok = (*Variables)[MethodCall.EvalStatement[0][0].NAME];
+					if (varTok.ID == "LIST")
+					{
+						if (MethodCall.EvalStatement[1][0].ID == "VAR")
+						{
+							Token secVarTok = (*Variables)[MethodCall.EvalStatement[1][0].NAME];
+							if (secVarTok.ID == "ERROR")
+							{
+								return secVarTok;
+							}
+							else
+							{
+								Token tok = varTok;
+								tok.EvalStatement.push_back(vector<Token>{secVarTok});
+								return tok;
+							}
+						}
+						else if (MethodCall.EvalStatement[1][0].ID == "ERROR")
+						{
+							return MethodCall.EvalStatement[1][0];
+						}
+						else
+						{
+							Token tok = varTok;
+							tok.EvalStatement.push_back(vector<Token>{MethodCall.EvalStatement[1][0]});
+							return tok;
+						}
+					}
+					else if (varTok.ID == "ERROR")
+					{
+						return varTok;
+					}
+					else
+					{
+						Token errorToken;
+						errorToken.ID = "ERROR";
+						errorToken.NAME = "First input in append() must be of type list";
+						return errorToken;
+					}
+				}
+				else
+				{
+					Token errorToken;
+					errorToken.ID = "ERROR";
+					errorToken.NAME = "Variable does not exist";
+					return errorToken;
+				}
+			}
+			else
+			{
+				Token errorToken;
+				errorToken.ID = "ERROR";
+				errorToken.NAME = "First input in append() must be of type list";
+				return errorToken;
+			}
+		}
+		else
+		{
+			Token errorToken;
+			errorToken.ID = "ERROR";
+			errorToken.NAME = "Incorrect input in append() method call";
+			return errorToken;
+		}
+	}
+	else if (MethodCall.NAME == "get")
+	{
+		if (MethodCall.EvalStatement[0].size() == 1 && MethodCall.EvalStatement[1].size() == 1)
+		{
+			if (MethodCall.EvalStatement[0][0].ID == "VAR")
+			{
+				Token tok = (*Variables)[MethodCall.EvalStatement[0][0].NAME];
+				if (tok.ID == "LIST")
+				{
+					if (MethodCall.EvalStatement[1][0].ID == "INT")
+					{
+						if (tok.EvalStatement.size() >= MethodCall.EvalStatement[1][0].intVal)
+						{
+							vector<Token> temp = tok.EvalStatement[MethodCall.EvalStatement[1][0].intVal];
+							if (temp.size() == 1 && temp[0].ID != "ERROR")
+							{
+								return temp[0];
+							}
+							else
+							{
+								Token errorToken;
+								errorToken.ID = "ERROR";
+								errorToken.NAME = "Error parsing list element";
+								return errorToken;
+							}
+						}
+						else
+						{
+							Token errorToken;
+							errorToken.ID = "ERROR";
+							errorToken.NAME = "Cant access index that does not exist";
+							return errorToken;
+						}
+					}
+					else if (MethodCall.EvalStatement[1][0].ID == "VAR")
+					{
+						Token varTok = (*Variables)[MethodCall.EvalStatement[1][0].NAME];
+						if (varTok.ID == "INT")
+						{
+							if (tok.EvalStatement.size() >= varTok.intVal)
+							{
+								vector<Token> temp = tok.EvalStatement[varTok.intVal];
+								if (temp.size() == 1 && temp[0].ID != "ERROR")
+								{
+									return temp[0];
+								}
+								else
+								{
+									Token errorToken;
+									errorToken.ID = "ERROR";
+									errorToken.NAME = "Error parsing list element";
+									return errorToken;
+								}
+							}
+							else
+							{
+								Token errorToken;
+								errorToken.ID = "ERROR";
+								errorToken.NAME = "Cant access index that does not exist";
+								return errorToken;
+							}
+						}
+						else if(varTok.ID == "ERROR")
+						{
+							return varTok;
+						}
+						else
+						{
+							Token errorToken;
+							errorToken.ID = "ERROR";
+							errorToken.NAME = "Second parameter in get() call must be of type int";
+							return errorToken;
+						}
+					}
+					else if (MethodCall.EvalStatement[1][0].ID == "ERROR")
+					{
+						return MethodCall.EvalStatement[1][0];
+					}
+					else
+					{
+						Token errorToken;
+						errorToken.ID = "ERROR";
+						errorToken.NAME = "Second parameter in get() call must be of type int";
+						return errorToken;
+					}
+				}
+				else if (tok.ID == "ERROR")
+				{
+					return tok;
+				}
+				else
+				{
+					Token errorToken;
+					errorToken.ID = "ERROR";
+					errorToken.NAME = "First input in get() must be of type list";
+					return errorToken;
+				}
+			}
+			else
+			{
+				Token errorToken;
+				errorToken.ID = "ERROR";
+				errorToken.NAME = "First input in get() must be of type list";
+				return errorToken;
+			}
+		}
+		else
+		{
+			Token errorToken;
+			errorToken.ID = "ERROR";
+			errorToken.NAME = "Incorrect input in get() method call";
 			return errorToken;
 		}
 	}
@@ -675,6 +863,21 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 			Token tok = ParseMethodCall(tokens[cursor], methods, Variables);
 			if (tok.ID == "ERROR") return tok;
 			if (tokens.size() == 1) return tok;
+		}
+		else if (tokens[cursor].ID == "LIST")
+		{
+			Token tok;
+			tok.ID = "LIST";
+			for (int i = 0; i < tokens[cursor].EvalStatement.size(); i++)
+			{
+				Token elementToken = Parse(tokens[cursor].EvalStatement[i], methods, Variables);
+				if (elementToken.ID == "ERROR") return elementToken;
+				tok.EvalStatement.push_back(vector<Token>{elementToken});
+			}
+			if (tokens.size() == 1)
+			{
+				return tok;
+			}
 		}
 		else if (tokens[cursor].ID == "RETURN")
 		{

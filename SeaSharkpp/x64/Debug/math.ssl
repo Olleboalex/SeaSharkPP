@@ -83,14 +83,6 @@ def cos(x)
 	{
 		x -= Tao
 	}
-	multi = 1
-	if(x > PI() / 2)
-	{
-		if(x < 2 * PI() / 3)
-		{
-			multi = -1
-		}
-	}
 
 	if(x > PI())
 	{
@@ -181,12 +173,12 @@ def PI()
 # Converts input to radians
 def ToRad(x)
 {
-	return x * PI() / 180
+	return x * 0.0174532925
 }
 
 # Input is in radians
 # Converts input to degrees
 def ToDegrees(x)
 {
-	return x * 180 / PI()
+	return x * 57.2957795
 }

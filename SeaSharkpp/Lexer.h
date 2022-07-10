@@ -311,6 +311,38 @@ vector<Token> LexText(string Text)
 				tok.EvalStatement = vector<vector<Token>>{ LexText(setText) };
 				tokens.push_back(tok);
 			}
+			else if (Text[cursor] == '[')
+			{
+				cursor++;
+				vector<vector<Token>> Items;
+				string contents = "";
+				int StraightBrackets = 1;
+				while (cursor < Text.size())
+				{
+					if (Text[cursor] == '[') StraightBrackets++;
+					if (Text[cursor] == ']') StraightBrackets--;
+					if (StraightBrackets == 0) break;
+					if (Text[cursor] == ',' && StraightBrackets == 1)
+					{
+						Items.push_back(LexText(contents));
+						contents = "";
+					}
+					else
+					{
+						contents += Text[cursor];
+					}
+					cursor++;
+				}
+				if (contents.size() > 0)
+				{
+					Items.push_back(LexText(contents));
+					contents = "";
+				}
+				Token tok;
+				tok.ID = "LIST";
+				tok.EvalStatement = Items;
+				tokens.push_back(tok);
+			}
 			else if (cursor < Text.size() - 1 && Text[cursor] == '+' && Text[cursor + 1] == '+')
 			{
 				while (cursor < Text.size())
@@ -460,7 +492,7 @@ vector<Token> LexText(string Text)
 							if (Text[cursor] == '(') parans++;
 							if (Text[cursor] == ')') parans--;
 							if (parans == 0) break;
-							if (Text[cursor] == ',')
+							if (Text[cursor] == ',' && parans == 1)
 							{
 								params.push_back(LexText(paramText));
 								paramText = "";
