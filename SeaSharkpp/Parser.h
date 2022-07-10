@@ -26,6 +26,7 @@ unordered_map<string, method> METHODS{
 	make_pair("random", method("random", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), true)),
 	make_pair("append", method("append", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), true)),
 	make_pair("get", method("get", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), true)),
+	make_pair("set", method("set", vector<vector<Token>> {vector<Token>(), vector<Token>(), vector<Token>()}, vector<Token>(), true)),
 	make_pair("size", method("size", vector<vector<Token>> {vector<Token>()}, vector<Token>(), true))
 };
 unordered_map<string, Token> VARIABLES;
@@ -346,7 +347,7 @@ Token SystemMethod(Token MethodCall, unordered_map<string, method>* methods, uno
 								return errorToken;
 							}
 						}
-						else if(varTok.ID == "ERROR")
+						else if (varTok.ID == "ERROR")
 						{
 							return varTok;
 						}
@@ -395,6 +396,142 @@ Token SystemMethod(Token MethodCall, unordered_map<string, method>* methods, uno
 			Token errorToken;
 			errorToken.ID = "ERROR";
 			errorToken.NAME = "Incorrect input in get() method call";
+			return errorToken;
+		}
+	}
+	else if (MethodCall.NAME == "set")
+	{
+		if (MethodCall.EvalStatement[0].size() == 1 && MethodCall.EvalStatement[1].size() == 1 && MethodCall.EvalStatement[2].size() == 1)
+		{
+			if (MethodCall.EvalStatement[0][0].ID == "VAR")
+			{
+				Token tok = (*Variables)[MethodCall.EvalStatement[0][0].NAME];
+				if (tok.ID == "LIST")
+				{
+					if (MethodCall.EvalStatement[1][0].ID == "INT")
+					{
+						if (tok.EvalStatement.size() > MethodCall.EvalStatement[1][0].intVal)
+						{
+							vector<Token> temp = tok.EvalStatement[MethodCall.EvalStatement[1][0].intVal];
+							if (MethodCall.EvalStatement[2][0].ID == "VAR")
+							{
+								Token varTok = (*Variables)[MethodCall.EvalStatement[2][0].NAME];
+								if (varTok.ID != "ERROR")
+								{
+									tok.EvalStatement[MethodCall.EvalStatement[1][0].intVal] = vector<Token>{ varTok };
+									return tok;
+								}
+								else
+								{
+									return varTok;
+								}
+							}
+							else if (MethodCall.EvalStatement[2][0].ID == "ERROR")
+							{
+								return MethodCall.EvalStatement[2][0];
+							}
+							else
+							{
+								tok.EvalStatement[MethodCall.EvalStatement[1][0].intVal] = vector<Token>{ MethodCall.EvalStatement[2][0] };
+								return tok;
+							}
+						}
+						else
+						{
+							Token errorToken;
+							errorToken.ID = "ERROR";
+							errorToken.NAME = "Cant access index that does not exist";
+							return errorToken;
+						}
+					}
+					else if (MethodCall.EvalStatement[1][0].ID == "VAR")
+					{
+						Token varTok = (*Variables)[MethodCall.EvalStatement[1][0].NAME];
+						if (varTok.ID == "INT")
+						{
+							if (tok.EvalStatement.size() > varTok.intVal)
+							{
+								vector<Token> temp = tok.EvalStatement[varTok.intVal];
+								if (MethodCall.EvalStatement[2][0].ID == "VAR")
+								{
+									Token varTok = (*Variables)[MethodCall.EvalStatement[2][0].NAME];
+									if (varTok.ID != "ERROR")
+									{
+										tok.EvalStatement[MethodCall.EvalStatement[1][0].intVal] = vector<Token>{ varTok };
+										return tok;
+									}
+									else
+									{
+										return varTok;
+									}
+								}
+								else if (MethodCall.EvalStatement[2][0].ID == "ERROR")
+								{
+									return MethodCall.EvalStatement[2][0];
+								}
+								else
+								{
+									tok.EvalStatement[MethodCall.EvalStatement[1][0].intVal] = vector<Token>{ MethodCall.EvalStatement[2][0] };
+									return tok;
+								}
+							}
+							else
+							{
+								Token errorToken;
+								errorToken.ID = "ERROR";
+								errorToken.NAME = "Cant access index that does not exist";
+								return errorToken;
+							}
+						}
+						else if (varTok.ID == "ERROR")
+						{
+							return varTok;
+						}
+						else
+						{
+							Token errorToken;
+							errorToken.ID = "ERROR";
+							errorToken.NAME = "Second parameter in set() call must be of type int";
+							return errorToken;
+						}
+					}
+					else if (MethodCall.EvalStatement[1][0].ID == "ERROR")
+					{
+						return MethodCall.EvalStatement[1][0];
+					}
+					else
+					{
+						Token errorToken;
+						errorToken.ID = "ERROR";
+						errorToken.NAME = "Second parameter in set() call must be of type int";
+						return errorToken;
+					}
+				}
+				else if (tok.ID == "ERROR")
+				{
+					return tok;
+				}
+				else
+				{
+					Token errorToken;
+					errorToken.ID = "ERROR";
+					errorToken.NAME = "First input in set() must be of type list";
+					return errorToken;
+				}
+			}
+			else
+			{
+				Token errorToken;
+				errorToken.ID = "ERROR";
+				errorToken.NAME = "First input in set() must be of type list";
+				return errorToken;
+			}
+		}
+		else
+		{
+			Token errorToken;
+			errorToken.ID = "ERROR";
+			errorToken.NAME = "Incorrect input in set() method call";
 			return errorToken;
 		}
 	}
