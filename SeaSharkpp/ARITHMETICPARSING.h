@@ -354,6 +354,13 @@ Token ParseBool(vector<Token> tokens, unordered_map<string, method>* methods, un
 	{
 		return Token(ParseArithmetic(LSide, methods, Variables).GetTokenValueAsFloat() < ParseArithmetic(RSide, methods, Variables).GetTokenValueAsFloat());
 	}
+	else
+	{
+		Token errorToken;
+		errorToken.ID = "ERROR";
+		errorToken.NAME = "No comparisor";
+		return errorToken;
+	}
 
 	return Token(false);
 }
