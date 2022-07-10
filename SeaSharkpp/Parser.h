@@ -25,7 +25,8 @@ unordered_map<string, method> METHODS{
 	make_pair("float", method("float", vector<vector<Token>> {vector<Token>()}, vector<Token>(), true)),
 	make_pair("random", method("random", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), true)),
 	make_pair("append", method("append", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), true)),
-	make_pair("get", method("get", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), true))
+	make_pair("get", method("get", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), true)),
+	make_pair("size", method("size", vector<vector<Token>> {vector<Token>()}, vector<Token>(), true))
 };
 unordered_map<string, Token> VARIABLES;
 
@@ -294,7 +295,7 @@ Token SystemMethod(Token MethodCall, unordered_map<string, method>* methods, uno
 				{
 					if (MethodCall.EvalStatement[1][0].ID == "INT")
 					{
-						if (tok.EvalStatement.size() >= MethodCall.EvalStatement[1][0].intVal)
+						if (tok.EvalStatement.size() > MethodCall.EvalStatement[1][0].intVal)
 						{
 							vector<Token> temp = tok.EvalStatement[MethodCall.EvalStatement[1][0].intVal];
 							if (temp.size() == 1 && temp[0].ID != "ERROR")
@@ -322,7 +323,7 @@ Token SystemMethod(Token MethodCall, unordered_map<string, method>* methods, uno
 						Token varTok = (*Variables)[MethodCall.EvalStatement[1][0].NAME];
 						if (varTok.ID == "INT")
 						{
-							if (tok.EvalStatement.size() >= varTok.intVal)
+							if (tok.EvalStatement.size() > varTok.intVal)
 							{
 								vector<Token> temp = tok.EvalStatement[varTok.intVal];
 								if (temp.size() == 1 && temp[0].ID != "ERROR")
@@ -397,6 +398,83 @@ Token SystemMethod(Token MethodCall, unordered_map<string, method>* methods, uno
 			return errorToken;
 		}
 	}
+	else if (MethodCall.NAME == "size")
+	{
+		if (MethodCall.EvalStatement.size() == 1 && MethodCall.EvalStatement[0].size() == 1)
+		{
+			if (MethodCall.EvalStatement[0][0].ID == "LIST")
+			{
+				Token tok;
+				tok.ID = "INT";
+				tok.intVal = MethodCall.EvalStatement[0][0].EvalStatement.size();
+				return tok;
+			}
+			else if (MethodCall.EvalStatement[0][0].ID == "VAR")
+			{
+				Token varTok = (*Variables)[MethodCall.EvalStatement[0][0].NAME];
+				if (varTok.ID == "LIST")
+				{
+					Token tok;
+					tok.ID = "INT";
+					tok.intVal = varTok.EvalStatement.size();
+					return tok;
+				}
+				else if (varTok.ID == "ERROR")
+				{
+					return varTok;
+				}
+				else
+				{
+					Token errorToken;
+					errorToken.ID = "ERROR";
+					errorToken.NAME = "Input in size() must be of type LIST";
+					return errorToken;
+				}
+			}
+			else if (MethodCall.EvalStatement[0][0].ID == "METHOD")
+			{
+				Token methodTok = Parse(vector<Token> {MethodCall.EvalStatement[0][0]}, methods, Variables);
+
+				if (methodTok.ID == "LIST")
+				{
+					Token tok;
+					tok.ID = "INT";
+					tok.intVal = methodTok.EvalStatement.size();
+					return tok;
+				}
+				else if (methodTok.ID == "ERROR")
+				{
+					return methodTok;
+				}
+				else
+				{
+					Token errorToken;
+					errorToken.ID = "ERROR";
+					errorToken.NAME = "Input in size() must be of type LIST";
+					return errorToken;
+				}
+
+			}
+			else if (MethodCall.EvalStatement[0][0].ID == "ERROR")
+			{
+				return MethodCall.EvalStatement[0][0];
+			}
+			else
+			{
+				Token errorToken;
+				errorToken.ID = "ERROR";
+				errorToken.NAME = "Input in size() must be of type LIST";
+				return errorToken;
+			}
+		}
+		else
+		{
+			Token errorToken;
+			errorToken.ID = "ERROR";
+			errorToken.NAME = "Incorrect parameter size in size() method call";
+			return errorToken;
+		}
+	}
 
 	return Token();
 }
@@ -410,7 +488,7 @@ Token ParseLib(vector<Token> tokens, unordered_map<string, method>* methods)
 	{
 		if (tokens[cursor].ID == "DEFINITION")
 		{
-			method Method = method(tokens[cursor].NAME, tokens[cursor].EvalStatement, tokens[cursor].ExecStatement);
+			method Method = method(tokens[cursor].NAME, tokens[cursor].EvalStatement, tokens[cursor].ExecStatement, false, true);
 			(*methods)[Method.Name] = Method;
 		}
 		else if (tokens[cursor].ID == "USING")
@@ -481,6 +559,17 @@ Token ParseMethodCall(Token MethodCall, unordered_map<string, method>* methods, 
 		Token tok = SystemMethod(MethodCall, methods, Variables);
 		return tok;
 	}
+	else if ((*methods)[MethodCall.NAME].fromLib)
+	{
+		unordered_map<string, Token> funcVariables = VARIABLES;
+		for (int i = 0; i < (*methods)[MethodCall.NAME].Parameters.size(); i++)
+		{
+			vector<Token> token = { MethodCall.EvalStatement[i] };
+			funcVariables[(*methods)[MethodCall.NAME].Parameters[i][0].NAME] = Parse(token, methods, Variables);
+		}
+		Token tok = Parse((*methods)[MethodCall.NAME].ExecutionStatements, methods, &funcVariables);
+		return tok;
+	}
 	else
 	{
 		unordered_map<string, Token> funcVariables = VARIABLES;
@@ -490,17 +579,6 @@ Token ParseMethodCall(Token MethodCall, unordered_map<string, method>* methods, 
 			funcVariables[(*methods)[MethodCall.NAME].Parameters[i][0].NAME] = Parse(token, methods, Variables);
 		}
 		Token tok = Parse((*methods)[MethodCall.NAME].ExecutionStatements, methods, &funcVariables);
-		/*for (int i = 0; i < (*methods)[MethodCall.NAME].Parameters.size(); i++)
-		{
-			if (VARIABLES.count((*methods)[MethodCall.NAME].Parameters[i][0].NAME))
-			{
-				funcVariables[(*methods)[MethodCall.NAME].Parameters[i][0].NAME] = VARIABLES[(*methods)[MethodCall.NAME].Parameters[i][0].NAME];
-			}
-			else
-			{
-				funcVariables.erase((*methods)[MethodCall.NAME].Parameters[i][0].NAME);
-			}
-		}*/
 		for (pair<string, Token> element : funcVariables)
 		{
 			if (VARIABLES.count(element.first))
@@ -510,12 +588,7 @@ Token ParseMethodCall(Token MethodCall, unordered_map<string, method>* methods, 
 					VARIABLES[element.first] = element.second;
 				}
 			}
-			else
-			{
-				//funcVariables.erase(element.first);
-			}
 		}
-		//VARIABLES = funcVariables;
 		return tok;
 	}
 }
@@ -553,11 +626,25 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 		}
 		else if (tokens[cursor].ID == "IF")
 		{
-			if (ParseBool(tokens[cursor].EvalStatement[0], methods, Variables))
+			Token boolTok = ParseBool(tokens[cursor].EvalStatement[0], methods, Variables);
+
+			if (boolTok.ID == "ERROR")
+			{
+				return boolTok;
+			}
+			else if (boolTok.ID != "BOOL")
+			{
+				Token errorToken;
+				errorToken.ID = "ERROR";
+				errorToken.NAME = "Input in if statement must be of type bool";
+				return errorToken;
+			}
+
+			if (boolTok.boolVal)
 			{
 				Token tok = Parse(tokens[cursor].ExecStatement, methods, Variables);
 				if (cursor < tokens.size() - 1 && tokens[cursor + 1].ID == "ELSE") cursor++;
-				//if (tok.ID != "NORETURN") return tok;
+				if (tok.ID != "NORETURN") return tok;
 			}
 			else
 			{
@@ -565,7 +652,7 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 				{
 					Token tok = Parse(tokens[cursor + 1].ExecStatement, methods, Variables);
 					cursor++;
-					//if (tok.ID != "NORETURN") return tok;
+					if (tok.ID != "NORETURN") return tok;
 				}
 			}
 		}
@@ -578,13 +665,36 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 		}
 		else if (tokens[cursor].ID == "WHILE")
 		{
-			bool run = ParseBool(tokens[cursor].EvalStatement[0], methods, Variables);
-			while (run)
+			Token run = ParseBool(tokens[cursor].EvalStatement[0], methods, Variables);
+
+			if (run.ID == "ERROR")
+			{
+				return run;
+			}
+			else if (run.ID != "BOOL")
+			{
+				Token errorToken;
+				errorToken.ID = "ERROR";
+				errorToken.NAME = "Input in if statement must be of type bool";
+				return errorToken;
+			}
+			while (run.boolVal)
 			{
 				Token tok = Parse(tokens[cursor].ExecStatement, methods, Variables);
 				//if (tok.ID != "NORETURN") return tok;
 				if (tok.ID == "ERROR") return tok;
 				run = ParseBool(tokens[cursor].EvalStatement[0], methods, Variables);
+				if (run.ID == "ERROR")
+				{
+					return run;
+				}
+				else if (run.ID != "BOOL")
+				{
+					Token errorToken;
+					errorToken.ID = "ERROR";
+					errorToken.NAME = "Input in if statement must be of type bool";
+					return errorToken;
+				}
 			}
 		}
 		else if (tokens[cursor].ID == "DEFINITION")
@@ -887,7 +997,7 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 		{
 			return ParseArithmetic(tokens, methods, Variables);
 		}
-		else if (tokens[cursor].ID == "BOOl")
+		else if (tokens[cursor].ID == "BOOL")
 		{
 			return Token(ParseBool(tokens, methods, Variables));
 		}

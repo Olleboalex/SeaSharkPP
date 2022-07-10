@@ -182,3 +182,27 @@ def ToDegrees(x)
 {
 	return x * 57.2957795
 }
+
+# Input is of type int
+# Returns true if input is prime otherwise returns false
+def isPrime(x)
+{
+	if(x == 2)
+	{
+		return true
+	}
+	if(x % 2 == 0)
+	{
+		return false
+	}
+	i = 3
+	while(i * i <= x)
+	{
+		if(x % i == 0)
+		{
+			return false
+		}
+		i++
+	}
+	return true
+}

@@ -28,12 +28,10 @@ int main()
 
 	vector<Token> tokens = LexText(code);
 
-	//cout << tokens.size();
-
 	Token runToken = Parse(tokens, &METHODS, &VARIABLES);
 
 	if (runToken.ID == "ERROR")
 	{
-		cout << "Error: " + runToken.NAME;
+		cout << endl << "Error: " + runToken.NAME;
 	}
 }

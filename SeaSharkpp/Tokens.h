@@ -217,6 +217,7 @@ struct method
 		vector<vector<Token>> Parameters;
 		vector<Token> ExecutionStatements;
 		bool SystemMethod;
+		bool fromLib;
 		method(string name, vector<vector<Token>> params, vector<Token> exec)
 		{
 			Name = name;
@@ -230,6 +231,15 @@ struct method
 			Parameters = params;
 			ExecutionStatements = exec;
 			SystemMethod = systemMethod;
+			fromLib = false;
+		}
+		method(string name, vector<vector<Token>> params, vector<Token> exec, bool systemMethod, bool library)
+		{
+			Name = name;
+			Parameters = params;
+			ExecutionStatements = exec;
+			SystemMethod = systemMethod;
+			fromLib = library;
 		}
 		method()
 		{

@@ -229,9 +229,60 @@ Token ParseArithmetic(vector<Token> tokens, unordered_map<string, method>* metho
 	return ParseArithmeticPARAN(resultTokens);
 }
 
-bool ParseBool(vector<Token> tokens, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token ParseBool(vector<Token> tokens, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
 {
-	if (tokens.size() == 1 && tokens[0].ID == "BOOL") return tokens[0].boolVal;
+	if (tokens.size() == 1)
+	{
+		if (tokens[0].ID == "BOOL")
+		{
+			return Token(tokens[0].boolVal);
+		}
+		else if (tokens[0].ID == "VAR")
+		{
+			Token varTok = (*Variables)[tokens[0].NAME];
+			if (varTok.ID == "BOOL")
+			{
+				return varTok;
+			}
+			else if(varTok.ID == "ERROR")
+			{
+				return varTok;
+			}
+			else
+			{
+				Token errorToken;
+				errorToken.ID = "ERROR";
+				errorToken.NAME = "Could not parse bool";
+				return errorToken;
+			}
+		}
+		else if (tokens[0].ID == "METHOD")
+		{
+			Token metTok = Parse(vector<Token>{tokens[0]}, methods, Variables);
+			if (metTok.ID == "BOOL")
+			{
+				return metTok;
+			}
+			else if (metTok.ID == "ERROR")
+			{
+				return metTok;
+			}
+			else
+			{
+				Token errorToken;
+				errorToken.ID = "ERROR";
+				errorToken.NAME = "Could not parse bool";
+				return errorToken;
+			}
+		}
+		else
+		{
+			Token errorTok;
+			errorTok.ID = "ERROR";
+			errorTok.NAME = "Could not parse bool";
+			return errorTok;
+		}
+	}
 	bool Equals = true;
 	string comparisor;
 	TOK LSide;
@@ -281,28 +332,28 @@ bool ParseBool(vector<Token> tokens, unordered_map<string, method>* methods, uno
 
 	if (comparisor == "EQUALS")
 	{
-		return ParseArithmetic(LSide, methods, Variables).GetTokenValueAsFloat() == ParseArithmetic(RSide, methods, Variables).GetTokenValueAsFloat();
+		return Token(ParseArithmetic(LSide, methods, Variables).GetTokenValueAsFloat() == ParseArithmetic(RSide, methods, Variables).GetTokenValueAsFloat());
 	}
 	else if (comparisor == "NOTEQUALS")
 	{
-		return ParseArithmetic(LSide, methods, Variables).GetTokenValueAsFloat() != ParseArithmetic(RSide, methods, Variables).GetTokenValueAsFloat();
+		return Token(ParseArithmetic(LSide, methods, Variables).GetTokenValueAsFloat() != ParseArithmetic(RSide, methods, Variables).GetTokenValueAsFloat());
 	}
 	else if (comparisor == "BIGEQUALS")
 	{
-		return ParseArithmetic(LSide, methods, Variables).GetTokenValueAsFloat() >= ParseArithmetic(RSide, methods, Variables).GetTokenValueAsFloat();
+		return Token(ParseArithmetic(LSide, methods, Variables).GetTokenValueAsFloat() >= ParseArithmetic(RSide, methods, Variables).GetTokenValueAsFloat());
 	}
 	else if (comparisor == "SMALLEQUALS")
 	{
-		return ParseArithmetic(LSide, methods, Variables).GetTokenValueAsFloat() <= ParseArithmetic(RSide, methods, Variables).GetTokenValueAsFloat();
+		return Token(ParseArithmetic(LSide, methods, Variables).GetTokenValueAsFloat() <= ParseArithmetic(RSide, methods, Variables).GetTokenValueAsFloat());
 	}
 	else if (comparisor == "BIGGER")
 	{
-		return ParseArithmetic(LSide, methods, Variables).GetTokenValueAsFloat() > ParseArithmetic(RSide, methods, Variables).GetTokenValueAsFloat();
+		return Token(ParseArithmetic(LSide, methods, Variables).GetTokenValueAsFloat() > ParseArithmetic(RSide, methods, Variables).GetTokenValueAsFloat());
 	}
 	else if (comparisor == "SMALLER")
 	{
-		return ParseArithmetic(LSide, methods, Variables).GetTokenValueAsFloat() < ParseArithmetic(RSide, methods, Variables).GetTokenValueAsFloat();
+		return Token(ParseArithmetic(LSide, methods, Variables).GetTokenValueAsFloat() < ParseArithmetic(RSide, methods, Variables).GetTokenValueAsFloat());
 	}
 
-	return false;
+	return Token(false);
 }
