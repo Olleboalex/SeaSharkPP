@@ -27,6 +27,7 @@ unordered_map<string, method> METHODS{
 	make_pair("append", method("append", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), true)),
 	make_pair("get", method("get", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), true)),
 	make_pair("set", method("set", vector<vector<Token>> {vector<Token>(), vector<Token>(), vector<Token>()}, vector<Token>(), true)),
+	make_pair("remove", method("remove", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), true)),
 	make_pair("size", method("size", vector<vector<Token>> {vector<Token>()}, vector<Token>(), true))
 };
 unordered_map<string, Token> VARIABLES;
@@ -398,6 +399,100 @@ Token SystemMethod(Token MethodCall, unordered_map<string, method>* methods, uno
 			errorToken.NAME = "Incorrect input in get() method call";
 			return errorToken;
 		}
+	}
+	else if (MethodCall.NAME == "remove")
+	{
+	if (MethodCall.EvalStatement[0].size() == 1 && MethodCall.EvalStatement[1].size() == 1)
+	{
+		if (MethodCall.EvalStatement[0][0].ID == "VAR")
+		{
+			Token tok = (*Variables)[MethodCall.EvalStatement[0][0].NAME];
+			if (tok.ID == "LIST")
+			{
+				if (MethodCall.EvalStatement[1][0].ID == "INT")
+				{
+					if (tok.EvalStatement.size() > MethodCall.EvalStatement[1][0].intVal)
+					{
+						tok.EvalStatement.erase(tok.EvalStatement.begin() + MethodCall.EvalStatement[1][0].intVal);
+						return tok;
+					}
+					else
+					{
+						Token errorToken;
+						errorToken.ID = "ERROR";
+						errorToken.NAME = "Cant access index that does not exist";
+						return errorToken;
+					}
+				}
+				else if (MethodCall.EvalStatement[1][0].ID == "VAR")
+				{
+					Token varTok = (*Variables)[MethodCall.EvalStatement[1][0].NAME];
+					if (varTok.ID == "INT")
+					{
+						if (tok.EvalStatement.size() > varTok.intVal)
+						{
+							tok.EvalStatement.erase(tok.EvalStatement.begin() + varTok.intVal);
+							return tok;
+						}
+						else
+						{
+							Token errorToken;
+							errorToken.ID = "ERROR";
+							errorToken.NAME = "Cant access index that does not exist";
+							return errorToken;
+						}
+					}
+					else if (varTok.ID == "ERROR")
+					{
+						return varTok;
+					}
+					else
+					{
+						Token errorToken;
+						errorToken.ID = "ERROR";
+						errorToken.NAME = "Second parameter in remove() call must be of type int";
+						return errorToken;
+					}
+				}
+				else if (MethodCall.EvalStatement[1][0].ID == "ERROR")
+				{
+					return MethodCall.EvalStatement[1][0];
+				}
+				else
+				{
+					Token errorToken;
+					errorToken.ID = "ERROR";
+					errorToken.NAME = "Second parameter in remove() call must be of type int";
+					return errorToken;
+				}
+			}
+			else if (tok.ID == "ERROR")
+			{
+				return tok;
+			}
+			else
+			{
+				Token errorToken;
+				errorToken.ID = "ERROR";
+				errorToken.NAME = "First input in remove() must be of type list";
+				return errorToken;
+			}
+		}
+		else
+		{
+			Token errorToken;
+			errorToken.ID = "ERROR";
+			errorToken.NAME = "First input in remove() must be of type list";
+			return errorToken;
+		}
+	}
+	else
+	{
+		Token errorToken;
+		errorToken.ID = "ERROR";
+		errorToken.NAME = "Incorrect input in remove() method call";
+		return errorToken;
+	}
 	}
 	else if (MethodCall.NAME == "set")
 	{
@@ -818,7 +913,7 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 			while (run.boolVal)
 			{
 				Token tok = Parse(tokens[cursor].ExecStatement, methods, Variables);
-				//if (tok.ID != "NORETURN") return tok;
+				if (tok.ID != "NORETURN") return tok;
 				if (tok.ID == "ERROR") return tok;
 				run = ParseBool(tokens[cursor].EvalStatement[0], methods, Variables);
 				if (run.ID == "ERROR")
