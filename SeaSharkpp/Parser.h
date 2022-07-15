@@ -913,7 +913,7 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 			while (run.boolVal)
 			{
 				Token tok = Parse(tokens[cursor].ExecStatement, methods, Variables);
-				if (tok.ID != "NORETURN") return tok;
+				//if (tok.ID != "NORETURN") return tok;
 				if (tok.ID == "ERROR") return tok;
 				run = ParseBool(tokens[cursor].EvalStatement[0], methods, Variables);
 				if (run.ID == "ERROR")

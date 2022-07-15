@@ -195,6 +195,14 @@ def isPrime(x)
 	{
 		return false
 	}
+	if(x == 3)
+	{
+		return true
+	}
+	if(x % 3 == 0)
+	{
+		return false
+	}
 	i = 3
 	while(i * i <= x)
 	{
