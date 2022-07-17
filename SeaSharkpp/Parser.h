@@ -8,6 +8,7 @@
 #include <time.h>
 #include "StandardLibrary.h"
 #include "FileWriter.h"
+#include "OpenGLSeaSharkLibrary.h"
 
 #define TOK vector<Token>
 
@@ -16,7 +17,7 @@ using namespace std;
 unordered_set<string> MathIDS{
 	"PLUS", "MINUS", "MULTIPLY", "DIVIDE", "MOD", "LPAR", "RPAR", "RCURLBRACK", "LCURLBRACK",
 	"EQUALS", "NOTEQUALS", "BIGEQUALS", "SMALLEQUALS", "SMALLER", "BIGGER", "INCREMENT",
-	"DECREMENT", "PLUSEQUALS", "MINUSEQUALS", "MULTIPLYEQUALS", "DIVIDEEQUALS"
+	"DECREMENT", "PLUSEQUALS", "MINUSEQUALS", "MULTIPLYEQUALS", "DIVIDEEQUALS", "NOT"
 };
 
 unordered_map<string, method> METHODS;
@@ -25,7 +26,8 @@ unordered_map<string, Token> VARIABLES;
 
 unordered_map<string, unordered_map<string, method>> ContainedLibraries{
 	make_pair("System", SystemMETHODS),
-	make_pair("FileWriter", FileWriterMETHODS)
+	make_pair("FileWriter", FileWriterMETHODS),
+	make_pair("OpenGL", OpenGLSSMethods)
 };
 
 /*
@@ -57,7 +59,7 @@ Token SystemMethod(Token MethodCall, unordered_map<string, method>* methods, uno
 	return Token();
 }
 
-string libPath = "D:\\VisualStudioProjects\\SeaSharkPLUSPLUS\\SeaSharkPP\\SeaSharkpp\\x64\\Debug\\";
+string libPath = "";
 
 Token ParseLib(vector<Token> tokens, unordered_map<string, method>* methods)
 {

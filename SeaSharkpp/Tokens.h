@@ -215,6 +215,20 @@ struct Token
 		}
 };
 
+Token ErrorToken(string error)
+{
+	Token tok;
+	tok.ID = "ERROR";
+	tok.NAME = error;
+	return tok;
+}
+Token noReturnToken()
+{
+	Token tok;
+	tok.ID = "NORETURN";
+	return tok;
+}
+
 struct method
 {
 	public:

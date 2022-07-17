@@ -303,9 +303,12 @@ vector<Token> LexText(string Text)
 			{
 				cursor++;
 				string setText = "";
+				int LBracks = 0;
 				while (cursor < Text.size())
 				{
-					if (Text[cursor] == '\n') break;
+					if (Text[cursor] == '[') LBracks++;
+					if (Text[cursor] == ']') LBracks--;
+					if (Text[cursor] == '\n' && !LBracks) break;
 					setText += Text[cursor];
 					cursor++;
 				}
@@ -427,6 +430,12 @@ vector<Token> LexText(string Text)
 				tok.ID = "DIVIDEEQUALS";
 				tok.EvalStatement = vector<vector<Token>>{ LexText(content) };
 				tokens.push_back(tok);
+			}
+			else if (Text[cursor] == '!')
+			{
+				Token result;
+				result.ID = "NOT";
+				tokens.push_back(result);
 			}
 			else if (Text[cursor] == '#')
 			{

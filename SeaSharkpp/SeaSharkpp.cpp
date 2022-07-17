@@ -6,10 +6,12 @@
 #include <string>
 #include "ARITHMETICPARSING.h"
 #include <unordered_map>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 using namespace std;
 
-string codePath = "D:\\VisualStudioProjects\\SeaSharkPLUSPLUS\\SeaSharkPP\\SeaSharkpp\\x64\\Debug\\code.ss";
+string codePath = ".\\code.ss";
 
 int main()
 {
@@ -33,5 +35,6 @@ int main()
 	if (runToken.ID == "ERROR")
 	{
 		cout << endl << "Error: " + runToken.NAME;
+		cin.get();
 	}
 }

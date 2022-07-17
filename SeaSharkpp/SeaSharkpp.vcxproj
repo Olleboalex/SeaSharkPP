@@ -136,8 +136,12 @@
     <ClCompile Include="SeaSharkpp.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ARITHMETICPARSING.h" />
     <ClInclude Include="FileWriter.h" />
+    <ClInclude Include="Lexer.h" />
+    <ClInclude Include="OpenGLSeaSharkLibrary.h" />
     <ClInclude Include="StandardLibrary.h" />
+    <ClInclude Include="Tokens.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -283,6 +283,61 @@ Token ParseBool(vector<Token> tokens, unordered_map<string, method>* methods, un
 			return errorTok;
 		}
 	}
+	else if (tokens.size() == 2)
+	{
+		if (tokens[0].ID == "NOT")
+		{
+			if (tokens[1].ID == "BOOL")
+			{
+				return Token(!tokens[1].boolVal);
+			}
+			else if (tokens[1].ID == "VAR")
+			{
+				Token varTok = (*Variables)[tokens[1].NAME];
+				if (varTok.ID == "BOOL")
+				{
+					return Token(!varTok.boolVal);
+				}
+				else if (varTok.ID == "ERROR")
+				{
+					return varTok;
+				}
+				else
+				{
+					Token errorToken;
+					errorToken.ID = "ERROR";
+					errorToken.NAME = "Could not parse bool";
+					return errorToken;
+				}
+			}
+			else if (tokens[1].ID == "METHOD")
+			{
+				Token metTok = Parse(vector<Token>{tokens[1]}, methods, Variables);
+				if (metTok.ID == "BOOL")
+				{
+					return Token(!metTok.boolVal);
+				}
+				else if (metTok.ID == "ERROR")
+				{
+					return metTok;
+				}
+				else
+				{
+					Token errorToken;
+					errorToken.ID = "ERROR";
+					errorToken.NAME = "Could not parse bool";
+					return errorToken;
+				}
+			}
+			else
+			{
+				Token errorTok;
+				errorTok.ID = "ERROR";
+				errorTok.NAME = "Could not parse bool";
+				return errorTok;
+			}
+		}
+	}
 	bool Equals = true;
 	string comparisor;
 	TOK LSide;
