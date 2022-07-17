@@ -7,9 +7,8 @@ D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\Tokens.h(70,37): 
 D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\Tokens.h(213,28): warning C4244: 'return': conversion from 'int' to 'float', possible loss of data
 D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\ARITHMETICPARSING.h(22,21): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
 D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\ARITHMETICPARSING.h(87,29): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\StandardLibrary.h(165,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\StandardLibrary.h(621,68): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\StandardLibrary.h(631,45): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\StandardLibrary.h(654,48): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\StandardLibrary.h(193,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\StandardLibrary.h(430,49): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\StandardLibrary.h(437,45): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
 D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\FileWriter.h(174): warning C4715: 'writeFile': not all control paths return a value
   SeaSharkpp.vcxproj -> D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\x64\Debug\SeaSharkpp.exe

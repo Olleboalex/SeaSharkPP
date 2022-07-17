@@ -28,7 +28,6 @@ unordered_map<string, unordered_map<string, method>> ContainedLibraries{
 	make_pair("FileWriter", FileWriterMETHODS)
 };
 
-
 /*
 Function parses elements in methodcall parameters and if none are of type error it calls the appropriate function.
 If function call contains incorrect number of parameters returns error here.
