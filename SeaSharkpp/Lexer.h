@@ -8,6 +8,9 @@ using namespace std;
 
 unordered_set<char> mathOperators {'+', '-', '*', '/', '%', '(', ')', '=', '!', '>', '<'};
 
+/*
+Lexer goes through input and converts the string into a vector of Token.
+*/
 vector<Token> LexText(string Text)
 {
 	vector<Token> tokens;

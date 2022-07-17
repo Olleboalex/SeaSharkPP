@@ -129,6 +129,10 @@
   <ItemGroup>
     <ClCompile Include="SeaSharkpp.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="FileWriter.h" />
+    <ClInclude Include="StandardLibrary.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

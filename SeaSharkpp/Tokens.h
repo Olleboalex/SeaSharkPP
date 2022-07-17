@@ -2,6 +2,11 @@
 #include <iostream>
 #include <math.h>
 #include <vector>
+#include <iostream>
+#include <unordered_map>
+#include <fstream>
+#include <string>
+#include <time.h>
 
 using namespace std;
 
@@ -216,6 +221,7 @@ struct method
 		string Name;
 		vector<vector<Token>> Parameters;
 		vector<Token> ExecutionStatements;
+		Token(*func)(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables);
 		bool SystemMethod;
 		bool fromLib;
 		method(string name, vector<vector<Token>> params, vector<Token> exec)
@@ -225,13 +231,23 @@ struct method
 			ExecutionStatements = exec;
 			SystemMethod = false;
 		}
-		method(string name, vector<vector<Token>> params, vector<Token> exec, bool systemMethod)
+		method(string name, vector<vector<Token>> params, vector<Token> exec, Token(*function)(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables), bool systemMethod)
 		{
 			Name = name;
 			Parameters = params;
 			ExecutionStatements = exec;
 			SystemMethod = systemMethod;
 			fromLib = false;
+			func = function;
+		}
+		method(string name, vector<vector<Token>> params, vector<Token> exec, Token(*function)(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables), bool systemMethod, bool library)
+		{
+			Name = name;
+			Parameters = params;
+			ExecutionStatements = exec;
+			SystemMethod = systemMethod;
+			fromLib = library;
+			func = function;
 		}
 		method(string name, vector<vector<Token>> params, vector<Token> exec, bool systemMethod, bool library)
 		{

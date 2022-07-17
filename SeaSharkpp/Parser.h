@@ -6,6 +6,8 @@
 #include <fstream>
 #include <string>
 #include <time.h>
+#include "StandardLibrary.h"
+#include "FileWriter.h"
 
 #define TOK vector<Token>
 
@@ -17,697 +19,42 @@ unordered_set<string> MathIDS{
 	"DECREMENT", "PLUSEQUALS", "MINUSEQUALS", "MULTIPLYEQUALS", "DIVIDEEQUALS"
 };
 
-unordered_map<string, method> METHODS{
-	make_pair("print", method("print", vector<vector<Token>> {vector<Token>()}, vector<Token>(), true)),
-	make_pair("printline", method("printline", vector<vector<Token>> {vector<Token>()}, vector<Token>(), true)),
-	make_pair("read", method("read", vector<vector<Token>>(), vector<Token>(), true)),
-	make_pair("int", method("int", vector<vector<Token>> {vector<Token>()}, vector<Token>(), true)),
-	make_pair("float", method("float", vector<vector<Token>> {vector<Token>()}, vector<Token>(), true)),
-	make_pair("random", method("random", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), true)),
-	make_pair("append", method("append", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), true)),
-	make_pair("get", method("get", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), true)),
-	make_pair("set", method("set", vector<vector<Token>> {vector<Token>(), vector<Token>(), vector<Token>()}, vector<Token>(), true)),
-	make_pair("remove", method("remove", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), true)),
-	make_pair("size", method("size", vector<vector<Token>> {vector<Token>()}, vector<Token>(), true))
-};
+unordered_map<string, method> METHODS;
+
 unordered_map<string, Token> VARIABLES;
 
+unordered_map<string, unordered_map<string, method>> ContainedLibraries{
+	make_pair("System", SystemMETHODS),
+	make_pair("FileWriter", FileWriterMETHODS)
+};
+
+
+/*
+Function parses elements in methodcall parameters and if none are of type error it calls the appropriate function.
+If function call contains incorrect number of parameters returns error here.
+*/
 Token SystemMethod(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
 {
-	if (MethodCall.NAME == "print")
+	if (METHODS.count(MethodCall.NAME))
 	{
-		if (MethodCall.EvalStatement.size() == 1)
+		if (METHODS[MethodCall.NAME].SystemMethod)
 		{
-			Token result = Parse(MethodCall.EvalStatement[0], methods, Variables);
-			if (result.ID == "FLOAT" || result.ID == "INT")
+			for (int i = 0; i < MethodCall.EvalStatement.size(); i++)
 			{
-				cout << result.GetTokenValueAsFloat();
+				Token result = Parse(MethodCall.EvalStatement[i], methods, Variables);
+				if (result.ID == "ERROR") return result;
+				MethodCall.EvalStatement[i] = vector<Token>{ result };
 			}
-			else if (result.ID == "STRING")
-			{
-				cout << result.stringVal;
-			}
-			else if (result.ID == "ERROR")
-			{
-				return result;
-			}
-		}
-		else
-		{
-			Token errorTok;
-			errorTok.ID = "ERROR";
-			errorTok.NAME = "Incorrect number of inputs in print() function call";
-		}
-	}
-	else if (MethodCall.NAME == "printline")
-	{
-		if (MethodCall.EvalStatement.size() == 1)
-		{
-			Token result = Parse(MethodCall.EvalStatement[0], methods, Variables);
-			if (result.ID == "FLOAT" || result.ID == "INT")
-			{
-				cout << result.GetTokenValueAsFloat() << endl;
-			}
-			else if (result.ID == "STRING")
-			{
-				cout << result.stringVal << endl;
-			}
-			else if (result.ID == "ERROR")
-			{
-				return result;
-			}
-		}
-		else
-		{
-			Token errorTok;
-			errorTok.ID = "ERROR";
-			errorTok.NAME = "Incorrect number of inputs in print() function call";
-		}
-	}
-	else if (MethodCall.NAME == "read")
-	{
-		Token tok;
-		tok.ID = "STRING";
-		cin >> tok.stringVal;
-		return tok;
-	}
-	else if (MethodCall.NAME == "int")
-	{
-		if (MethodCall.EvalStatement.size() != 1 || MethodCall.EvalStatement[0].size() != 1)
-		{
-			Token errorTok;
-			errorTok.ID = "ERROR";
-			errorTok.NAME = "Incorrect input in int() method call";
-		}
-		Token tok = MethodCall.EvalStatement[0][0];
-		if (MethodCall.EvalStatement[0][0].ID == "VAR")
-		{
-			tok = (*Variables)[MethodCall.EvalStatement[0][0].NAME];
-		}
-		else if (MethodCall.EvalStatement[0][0].ID == "METHOD")
-		{
-			tok = Parse(MethodCall.EvalStatement[0], methods, Variables);
-		}
-
-		if (tok.ID == "STRING")
-		{
-			Token token = Token(tok.stringVal);
-			token.intVal = static_cast<int>(token.GetTokenValueAsFloat());
-			token.ID = "INT";
-			return token;
-		}
-		else if (tok.ID == "FLOAT" || tok.ID == "INT")
-		{
-			Token token;
-			token.ID = "INT";
-			token.intVal = static_cast<int>(tok.GetTokenValueAsFloat());
-			return token;
-		}
-		else
-		{
-			Token errorTok;
-			errorTok.ID = "ERROR";
-			errorTok.NAME = "Input must be of type string or float";
-			return errorTok;
-		}
-	}
-	else if (MethodCall.NAME == "float")
-	{
-		if (MethodCall.EvalStatement.size() != 1 || MethodCall.EvalStatement[0].size() != 1)
-		{
-			Token errorTok;
-			errorTok.ID = "ERROR";
-			errorTok.NAME = "Incorrect input in float() method call";
-		}
-		Token tok = MethodCall.EvalStatement[0][0];
-		if (MethodCall.EvalStatement[0][0].ID == "VAR")
-		{
-			tok = (*Variables)[MethodCall.EvalStatement[0][0].NAME];
-		}
-		else if (MethodCall.EvalStatement[0][0].ID == "METHOD")
-		{
-			tok = Parse(MethodCall.EvalStatement[0], methods, Variables);
-		}
-
-		if (tok.ID == "STRING")
-		{
-			Token token = Token(tok.stringVal);
-			token.floatVal = token.GetTokenValueAsFloat();
-			token.ID = "FLOAT";
-			return token;
-		}
-		else if (tok.ID == "INT" || tok.ID == "FLOAT")
-		{
-			Token token;
-			token.ID = "FLOAT";
-			token.floatVal = tok.GetTokenValueAsFloat();
-			return token;
-		}
-		else
-		{
-			Token errorTok;
-			errorTok.ID = "ERROR";
-			errorTok.NAME = "Input must be of type string, int or float";
-			return errorTok;
-		}
-	}
-	else if (MethodCall.NAME == "random")
-	{
-		if (MethodCall.EvalStatement.size() == 2)
-		{
-			Token LowerLimit = Parse(MethodCall.EvalStatement[0], methods, Variables);
-			Token UpperLimit = Parse(MethodCall.EvalStatement[1], methods, Variables);
-
-			if (LowerLimit.ID == "INT" && UpperLimit.ID == "INT")
-			{
-				if (LowerLimit.intVal < UpperLimit.intVal)
-				{
-					srand(time(NULL));
-					int result = rand() % (UpperLimit.intVal + 1 - LowerLimit.intVal) + LowerLimit.intVal;
-					Token tok;
-					tok.ID = "INT";
-					tok.intVal = result;
-					return tok;
-				}
-				else
-				{
-					Token errorToken;
-					errorToken.ID = "ERROR";
-					errorToken.NAME = "random() lower limit must be lower than upper limit";
-					return errorToken;
-				}
-			}
-			else
-			{
-				Token errorToken;
-				errorToken.ID = "ERROR";
-				errorToken.NAME = "Parameters in random() must be of type int";
-				return errorToken;
-			}
-
+			return METHODS[MethodCall.NAME].func(MethodCall, methods, Variables);
 		}
 		else
 		{
 			Token errorToken;
 			errorToken.ID = "ERROR";
-			errorToken.NAME = "Incorrect number of inputs in random() function call";
+			errorToken.NAME = "This is not a built in function";
 			return errorToken;
 		}
 	}
-	else if (MethodCall.NAME == "append")
-	{
-		if (MethodCall.EvalStatement[0].size() == 1 && MethodCall.EvalStatement[1].size() == 1)
-		{
-			if (MethodCall.EvalStatement[0][0].ID == "VAR")
-			{
-				if ((*Variables).count(MethodCall.EvalStatement[0][0].NAME))
-				{
-					Token varTok = (*Variables)[MethodCall.EvalStatement[0][0].NAME];
-					if (varTok.ID == "LIST")
-					{
-						if (MethodCall.EvalStatement[1][0].ID == "VAR")
-						{
-							Token secVarTok = (*Variables)[MethodCall.EvalStatement[1][0].NAME];
-							if (secVarTok.ID == "ERROR")
-							{
-								return secVarTok;
-							}
-							else
-							{
-								Token tok = varTok;
-								tok.EvalStatement.push_back(vector<Token>{secVarTok});
-								return tok;
-							}
-						}
-						else if (MethodCall.EvalStatement[1][0].ID == "ERROR")
-						{
-							return MethodCall.EvalStatement[1][0];
-						}
-						else
-						{
-							Token tok = varTok;
-							tok.EvalStatement.push_back(vector<Token>{MethodCall.EvalStatement[1][0]});
-							return tok;
-						}
-					}
-					else if (varTok.ID == "ERROR")
-					{
-						return varTok;
-					}
-					else
-					{
-						Token errorToken;
-						errorToken.ID = "ERROR";
-						errorToken.NAME = "First input in append() must be of type list";
-						return errorToken;
-					}
-				}
-				else
-				{
-					Token errorToken;
-					errorToken.ID = "ERROR";
-					errorToken.NAME = "Variable does not exist";
-					return errorToken;
-				}
-			}
-			else
-			{
-				Token errorToken;
-				errorToken.ID = "ERROR";
-				errorToken.NAME = "First input in append() must be of type list";
-				return errorToken;
-			}
-		}
-		else
-		{
-			Token errorToken;
-			errorToken.ID = "ERROR";
-			errorToken.NAME = "Incorrect input in append() method call";
-			return errorToken;
-		}
-	}
-	else if (MethodCall.NAME == "get")
-	{
-		if (MethodCall.EvalStatement[0].size() == 1 && MethodCall.EvalStatement[1].size() == 1)
-		{
-			if (MethodCall.EvalStatement[0][0].ID == "VAR")
-			{
-				Token tok = (*Variables)[MethodCall.EvalStatement[0][0].NAME];
-				if (tok.ID == "LIST")
-				{
-					if (MethodCall.EvalStatement[1][0].ID == "INT")
-					{
-						if (tok.EvalStatement.size() > MethodCall.EvalStatement[1][0].intVal)
-						{
-							vector<Token> temp = tok.EvalStatement[MethodCall.EvalStatement[1][0].intVal];
-							if (temp.size() == 1 && temp[0].ID != "ERROR")
-							{
-								return temp[0];
-							}
-							else
-							{
-								Token errorToken;
-								errorToken.ID = "ERROR";
-								errorToken.NAME = "Error parsing list element";
-								return errorToken;
-							}
-						}
-						else
-						{
-							Token errorToken;
-							errorToken.ID = "ERROR";
-							errorToken.NAME = "Cant access index that does not exist";
-							return errorToken;
-						}
-					}
-					else if (MethodCall.EvalStatement[1][0].ID == "VAR")
-					{
-						Token varTok = (*Variables)[MethodCall.EvalStatement[1][0].NAME];
-						if (varTok.ID == "INT")
-						{
-							if (tok.EvalStatement.size() > varTok.intVal)
-							{
-								vector<Token> temp = tok.EvalStatement[varTok.intVal];
-								if (temp.size() == 1 && temp[0].ID != "ERROR")
-								{
-									return temp[0];
-								}
-								else
-								{
-									Token errorToken;
-									errorToken.ID = "ERROR";
-									errorToken.NAME = "Error parsing list element";
-									return errorToken;
-								}
-							}
-							else
-							{
-								Token errorToken;
-								errorToken.ID = "ERROR";
-								errorToken.NAME = "Cant access index that does not exist";
-								return errorToken;
-							}
-						}
-						else if (varTok.ID == "ERROR")
-						{
-							return varTok;
-						}
-						else
-						{
-							Token errorToken;
-							errorToken.ID = "ERROR";
-							errorToken.NAME = "Second parameter in get() call must be of type int";
-							return errorToken;
-						}
-					}
-					else if (MethodCall.EvalStatement[1][0].ID == "ERROR")
-					{
-						return MethodCall.EvalStatement[1][0];
-					}
-					else
-					{
-						Token errorToken;
-						errorToken.ID = "ERROR";
-						errorToken.NAME = "Second parameter in get() call must be of type int";
-						return errorToken;
-					}
-				}
-				else if (tok.ID == "ERROR")
-				{
-					return tok;
-				}
-				else
-				{
-					Token errorToken;
-					errorToken.ID = "ERROR";
-					errorToken.NAME = "First input in get() must be of type list";
-					return errorToken;
-				}
-			}
-			else
-			{
-				Token errorToken;
-				errorToken.ID = "ERROR";
-				errorToken.NAME = "First input in get() must be of type list";
-				return errorToken;
-			}
-		}
-		else
-		{
-			Token errorToken;
-			errorToken.ID = "ERROR";
-			errorToken.NAME = "Incorrect input in get() method call";
-			return errorToken;
-		}
-	}
-	else if (MethodCall.NAME == "remove")
-	{
-	if (MethodCall.EvalStatement[0].size() == 1 && MethodCall.EvalStatement[1].size() == 1)
-	{
-		if (MethodCall.EvalStatement[0][0].ID == "VAR")
-		{
-			Token tok = (*Variables)[MethodCall.EvalStatement[0][0].NAME];
-			if (tok.ID == "LIST")
-			{
-				if (MethodCall.EvalStatement[1][0].ID == "INT")
-				{
-					if (tok.EvalStatement.size() > MethodCall.EvalStatement[1][0].intVal)
-					{
-						tok.EvalStatement.erase(tok.EvalStatement.begin() + MethodCall.EvalStatement[1][0].intVal);
-						return tok;
-					}
-					else
-					{
-						Token errorToken;
-						errorToken.ID = "ERROR";
-						errorToken.NAME = "Cant access index that does not exist";
-						return errorToken;
-					}
-				}
-				else if (MethodCall.EvalStatement[1][0].ID == "VAR")
-				{
-					Token varTok = (*Variables)[MethodCall.EvalStatement[1][0].NAME];
-					if (varTok.ID == "INT")
-					{
-						if (tok.EvalStatement.size() > varTok.intVal)
-						{
-							tok.EvalStatement.erase(tok.EvalStatement.begin() + varTok.intVal);
-							return tok;
-						}
-						else
-						{
-							Token errorToken;
-							errorToken.ID = "ERROR";
-							errorToken.NAME = "Cant access index that does not exist";
-							return errorToken;
-						}
-					}
-					else if (varTok.ID == "ERROR")
-					{
-						return varTok;
-					}
-					else
-					{
-						Token errorToken;
-						errorToken.ID = "ERROR";
-						errorToken.NAME = "Second parameter in remove() call must be of type int";
-						return errorToken;
-					}
-				}
-				else if (MethodCall.EvalStatement[1][0].ID == "ERROR")
-				{
-					return MethodCall.EvalStatement[1][0];
-				}
-				else
-				{
-					Token errorToken;
-					errorToken.ID = "ERROR";
-					errorToken.NAME = "Second parameter in remove() call must be of type int";
-					return errorToken;
-				}
-			}
-			else if (tok.ID == "ERROR")
-			{
-				return tok;
-			}
-			else
-			{
-				Token errorToken;
-				errorToken.ID = "ERROR";
-				errorToken.NAME = "First input in remove() must be of type list";
-				return errorToken;
-			}
-		}
-		else
-		{
-			Token errorToken;
-			errorToken.ID = "ERROR";
-			errorToken.NAME = "First input in remove() must be of type list";
-			return errorToken;
-		}
-	}
-	else
-	{
-		Token errorToken;
-		errorToken.ID = "ERROR";
-		errorToken.NAME = "Incorrect input in remove() method call";
-		return errorToken;
-	}
-	}
-	else if (MethodCall.NAME == "set")
-	{
-		if (MethodCall.EvalStatement[0].size() == 1 && MethodCall.EvalStatement[1].size() == 1 && MethodCall.EvalStatement[2].size() == 1)
-		{
-			if (MethodCall.EvalStatement[0][0].ID == "VAR")
-			{
-				Token tok = (*Variables)[MethodCall.EvalStatement[0][0].NAME];
-				if (tok.ID == "LIST")
-				{
-					if (MethodCall.EvalStatement[1][0].ID == "INT")
-					{
-						if (tok.EvalStatement.size() > MethodCall.EvalStatement[1][0].intVal)
-						{
-							vector<Token> temp = tok.EvalStatement[MethodCall.EvalStatement[1][0].intVal];
-							if (MethodCall.EvalStatement[2][0].ID == "VAR")
-							{
-								Token varTok = (*Variables)[MethodCall.EvalStatement[2][0].NAME];
-								if (varTok.ID != "ERROR")
-								{
-									tok.EvalStatement[MethodCall.EvalStatement[1][0].intVal] = vector<Token>{ varTok };
-									return tok;
-								}
-								else
-								{
-									return varTok;
-								}
-							}
-							else if (MethodCall.EvalStatement[2][0].ID == "ERROR")
-							{
-								return MethodCall.EvalStatement[2][0];
-							}
-							else
-							{
-								tok.EvalStatement[MethodCall.EvalStatement[1][0].intVal] = vector<Token>{ MethodCall.EvalStatement[2][0] };
-								return tok;
-							}
-						}
-						else
-						{
-							Token errorToken;
-							errorToken.ID = "ERROR";
-							errorToken.NAME = "Cant access index that does not exist";
-							return errorToken;
-						}
-					}
-					else if (MethodCall.EvalStatement[1][0].ID == "VAR")
-					{
-						Token varTok = (*Variables)[MethodCall.EvalStatement[1][0].NAME];
-						if (varTok.ID == "INT")
-						{
-							if (tok.EvalStatement.size() > varTok.intVal)
-							{
-								vector<Token> temp = tok.EvalStatement[varTok.intVal];
-								if (MethodCall.EvalStatement[2][0].ID == "VAR")
-								{
-									Token varTok = (*Variables)[MethodCall.EvalStatement[2][0].NAME];
-									if (varTok.ID != "ERROR")
-									{
-										tok.EvalStatement[MethodCall.EvalStatement[1][0].intVal] = vector<Token>{ varTok };
-										return tok;
-									}
-									else
-									{
-										return varTok;
-									}
-								}
-								else if (MethodCall.EvalStatement[2][0].ID == "ERROR")
-								{
-									return MethodCall.EvalStatement[2][0];
-								}
-								else
-								{
-									tok.EvalStatement[MethodCall.EvalStatement[1][0].intVal] = vector<Token>{ MethodCall.EvalStatement[2][0] };
-									return tok;
-								}
-							}
-							else
-							{
-								Token errorToken;
-								errorToken.ID = "ERROR";
-								errorToken.NAME = "Cant access index that does not exist";
-								return errorToken;
-							}
-						}
-						else if (varTok.ID == "ERROR")
-						{
-							return varTok;
-						}
-						else
-						{
-							Token errorToken;
-							errorToken.ID = "ERROR";
-							errorToken.NAME = "Second parameter in set() call must be of type int";
-							return errorToken;
-						}
-					}
-					else if (MethodCall.EvalStatement[1][0].ID == "ERROR")
-					{
-						return MethodCall.EvalStatement[1][0];
-					}
-					else
-					{
-						Token errorToken;
-						errorToken.ID = "ERROR";
-						errorToken.NAME = "Second parameter in set() call must be of type int";
-						return errorToken;
-					}
-				}
-				else if (tok.ID == "ERROR")
-				{
-					return tok;
-				}
-				else
-				{
-					Token errorToken;
-					errorToken.ID = "ERROR";
-					errorToken.NAME = "First input in set() must be of type list";
-					return errorToken;
-				}
-			}
-			else
-			{
-				Token errorToken;
-				errorToken.ID = "ERROR";
-				errorToken.NAME = "First input in set() must be of type list";
-				return errorToken;
-			}
-		}
-		else
-		{
-			Token errorToken;
-			errorToken.ID = "ERROR";
-			errorToken.NAME = "Incorrect input in set() method call";
-			return errorToken;
-		}
-	}
-	else if (MethodCall.NAME == "size")
-	{
-		if (MethodCall.EvalStatement.size() == 1 && MethodCall.EvalStatement[0].size() == 1)
-		{
-			if (MethodCall.EvalStatement[0][0].ID == "LIST")
-			{
-				Token tok;
-				tok.ID = "INT";
-				tok.intVal = MethodCall.EvalStatement[0][0].EvalStatement.size();
-				return tok;
-			}
-			else if (MethodCall.EvalStatement[0][0].ID == "VAR")
-			{
-				Token varTok = (*Variables)[MethodCall.EvalStatement[0][0].NAME];
-				if (varTok.ID == "LIST")
-				{
-					Token tok;
-					tok.ID = "INT";
-					tok.intVal = varTok.EvalStatement.size();
-					return tok;
-				}
-				else if (varTok.ID == "ERROR")
-				{
-					return varTok;
-				}
-				else
-				{
-					Token errorToken;
-					errorToken.ID = "ERROR";
-					errorToken.NAME = "Input in size() must be of type LIST";
-					return errorToken;
-				}
-			}
-			else if (MethodCall.EvalStatement[0][0].ID == "METHOD")
-			{
-				Token methodTok = Parse(vector<Token> {MethodCall.EvalStatement[0][0]}, methods, Variables);
-
-				if (methodTok.ID == "LIST")
-				{
-					Token tok;
-					tok.ID = "INT";
-					tok.intVal = methodTok.EvalStatement.size();
-					return tok;
-				}
-				else if (methodTok.ID == "ERROR")
-				{
-					return methodTok;
-				}
-				else
-				{
-					Token errorToken;
-					errorToken.ID = "ERROR";
-					errorToken.NAME = "Input in size() must be of type LIST";
-					return errorToken;
-				}
-
-			}
-			else if (MethodCall.EvalStatement[0][0].ID == "ERROR")
-			{
-				return MethodCall.EvalStatement[0][0];
-			}
-			else
-			{
-				Token errorToken;
-				errorToken.ID = "ERROR";
-				errorToken.NAME = "Input in size() must be of type LIST";
-				return errorToken;
-			}
-		}
-		else
-		{
-			Token errorToken;
-			errorToken.ID = "ERROR";
-			errorToken.NAME = "Incorrect parameter size in size() method call";
-			return errorToken;
-		}
-	}
-
 	return Token();
 }
 
@@ -725,28 +72,38 @@ Token ParseLib(vector<Token> tokens, unordered_map<string, method>* methods)
 		}
 		else if (tokens[cursor].ID == "USING")
 		{
-			fstream lib;
-			string path = libPath + tokens[cursor].NAME + ".ssl";
-			lib.open(path, ios::in);
-			string code = "";
-			if (lib.is_open())
+			if (ContainedLibraries.count(tokens[cursor].NAME))
 			{
-				string line;
-				while (getline(lib, line))
+				for (pair<string, method> var : ContainedLibraries[tokens[cursor].NAME])
 				{
-					code += line + '\n';
+					METHODS.insert(var);
 				}
-				lib.close();
 			}
 			else
 			{
-				Token errorTok;
-				errorTok.ID = "ERROR";
-				errorTok.NAME = "Failed to load library " + tokens[cursor].NAME;
-				return errorTok;
+				fstream lib;
+				string path = libPath + tokens[cursor].NAME + ".ssl";
+				lib.open(path, ios::in);
+				string code = "";
+				if (lib.is_open())
+				{
+					string line;
+					while (getline(lib, line))
+					{
+						code += line + '\n';
+					}
+					lib.close();
+				}
+				else
+				{
+					Token errorTok;
+					errorTok.ID = "ERROR";
+					errorTok.NAME = "Failed to load library " + tokens[cursor].NAME;
+					return errorTok;
+				}
+				Token libToken = ParseLib(LexText(code), methods);
+				if (libToken.ID == "ERROR") return libToken;
 			}
-			Token libToken = ParseLib(LexText(code), methods);
-			if (libToken.ID == "ERROR") return libToken;
 		}
 		else
 		{
@@ -832,29 +189,38 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 	{
 		if (tokens[cursor].ID == "USING")
 		{
-			fstream lib;
-			string path = libPath + tokens[cursor].NAME + ".ssl";
-			lib.open(path, ios::in);
-			string code = "";
-			if (lib.is_open())
+			if (ContainedLibraries.count(tokens[cursor].NAME))
 			{
-				string line;
-				while (getline(lib, line))
+				for (pair<string, method> var : ContainedLibraries[tokens[cursor].NAME])
 				{
-					code += line + '\n';
+					METHODS.insert(var);
 				}
-				lib.close();
 			}
 			else
 			{
-				Token errorTok;
-				errorTok.ID = "ERROR";
-				errorTok.NAME = "Failed to load library " + tokens[cursor].NAME;
-				return errorTok;
+				fstream lib;
+				string path = libPath + tokens[cursor].NAME + ".ssl";
+				lib.open(path, ios::in);
+				string code = "";
+				if (lib.is_open())
+				{
+					string line;
+					while (getline(lib, line))
+					{
+						code += line + '\n';
+					}
+					lib.close();
+				}
+				else
+				{
+					Token errorTok;
+					errorTok.ID = "ERROR";
+					errorTok.NAME = "Failed to load library " + tokens[cursor].NAME;
+					return errorTok;
+				}
+				Token libToken = ParseLib(LexText(code), methods);
+				if (libToken.ID == "ERROR") return libToken;
 			}
-			Token libToken = ParseLib(LexText(code), methods);
-			if (libToken.ID == "ERROR") return libToken;
-
 		}
 		else if (tokens[cursor].ID == "IF")
 		{
