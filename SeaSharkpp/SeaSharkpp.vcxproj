@@ -140,6 +140,7 @@
     <ClInclude Include="FileWriter.h" />
     <ClInclude Include="Lexer.h" />
     <ClInclude Include="OpenGLSeaSharkLibrary.h" />
+    <ClInclude Include="Parser.h" />
     <ClInclude Include="StandardLibrary.h" />
     <ClInclude Include="Tokens.h" />
   </ItemGroup>

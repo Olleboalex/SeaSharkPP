@@ -44,8 +44,11 @@ while(!gl_shouldClose(shader))
 {
 	curTime = gl_getTime()
 	deltaTime = curTime - prevTime
-	printline(1 / deltaTime)
 	prevTime = curTime
+
+	gl_setmousePosition(400, 300)
+
+	gl_setmouseVisibility(false)
 
 	realSpeed = playerSpeed * deltaTime
 
@@ -76,6 +79,11 @@ while(!gl_shouldClose(shader))
 	gl_uniform2f(shader, "playerSize", get(PlayerScale, 0), get(PlayerScale, 1) * widthHeightratio)
 	gl_uniform1f(shader, "GroundHeight", groundHeight * widthHeightratio)
 	gl_Update(shader)
+
+	if(gl_isPressed("ESCAPE"))
+	{
+		gl_Close(shader)
+	}
 }
 
 gl_Terminate()

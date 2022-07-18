@@ -182,12 +182,16 @@ Token checkInput(string key)
 			return Token(glfwGetKey(glfwGetCurrentContext(), key[0]) == GLFW_PRESS);
 		}
 	}
+
+	if (key == "ESCAPE")
+	{
+		return Token(glfwGetKey(glfwGetCurrentContext(), GLFW_KEY_ESCAPE) == GLFW_PRESS);
+	}
 	
 	return ErrorToken("That is not a valid key");
 }
 
 unordered_map<string, Shader> Shaders;
-
 
 /*Method initializes opengl*/
 Token gl_INIT(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
@@ -559,6 +563,68 @@ Token gl_isPressed(Token MethodCall, unordered_map<string, method>* methods, uno
 	}
 }
 
+/*Returns current mouse position in screen coordinates as a list with two elements*/
+Token gl_mousePosition(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+{
+	Token result;
+	result.ID = "LIST";
+
+	double x, y;
+
+	glfwGetCursorPos(glfwGetCurrentContext(), &x, &y);
+
+	Token xTok;
+	xTok.ID = "FLOAT";
+	xTok.floatVal = x;
+	Token yTok;
+	yTok.ID = "FLOAT";
+	yTok.floatVal = y;
+
+	result.EvalStatement.push_back(vector<Token> {xTok});
+	result.EvalStatement.push_back(vector<Token> {yTok});
+
+	return result;
+}
+
+/*Method sets the position of the mouse coordinates to the given ints*/
+Token gl_setmousePosition(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+{
+	Token xTok = MethodCall.EvalStatement[0][0];
+	Token yTok = MethodCall.EvalStatement[1][0];
+	if (xTok.ID == "INT" && yTok.ID == "INT")
+	{
+		glfwSetCursorPos(glfwGetCurrentContext(), xTok.intVal, yTok.intVal);
+		
+		return noReturnToken();
+	}
+	else
+	{
+		return ErrorToken("First and second parameters in gl_setmousePosition() call must be of type int");
+	}
+}
+
+/*Method sets the visibility of the cursor input is bool*/
+Token gl_setmouseVisibility(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+{
+	Token input = MethodCall.EvalStatement[0][0];
+	if (input.ID == "BOOL")
+	{
+		if (input.boolVal)
+		{
+			glfwSetInputMode(glfwGetCurrentContext(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		}
+		else
+		{
+			glfwSetInputMode(glfwGetCurrentContext(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+		}
+	}
+	else
+	{
+		return ErrorToken("First parameter in gl_setmouseVisibility() call must be of type bool");
+	}
+	return noReturnToken();
+}
+
 /*Method sets uniform values in the given shader*/
 Token gl_uniform1f(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
 {
@@ -655,6 +721,9 @@ unordered_map<string, method> OpenGLSSMethods
 	make_pair("gl_getTime", method("gl_getTime", vector<vector<Token>> (), vector<Token>(), &gl_getTime, true)),
 	make_pair("gl_Close", method("gl_Close", vector<vector<Token>> {vector<Token>()}, vector<Token>(), &gl_Close, true)),
 	make_pair("gl_isPressed", method("gl_isPressed", vector<vector<Token>> {vector<Token>()}, vector<Token>(), &gl_isPressed, true)),
+	make_pair("gl_mousePosition", method("gl_mousePosition", vector<vector<Token>> (), vector<Token>(), &gl_mousePosition, true)),
+	make_pair("gl_setmousePosition", method("gl_setmousePosition", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), &gl_setmousePosition, true)),
+	make_pair("gl_setmouseVisibility", method("gl_setmouseVisibility", vector<vector<Token>> {vector<Token>()}, vector<Token>(), &gl_setmouseVisibility, true)),
 	make_pair("gl_uniform1f", method("gl_uniform1f", vector<vector<Token>> {vector<Token>(), vector<Token>(), vector<Token>()}, vector<Token>(), &gl_uniform1f, true)),
 	make_pair("gl_uniform2f", method("gl_uniform2f", vector<vector<Token>> {vector<Token>(), vector<Token>(), vector<Token>(), vector<Token>()}, vector<Token>(), &gl_uniform2f, true)),
 };
