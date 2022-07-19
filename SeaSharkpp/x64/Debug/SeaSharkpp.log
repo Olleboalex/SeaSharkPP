@@ -5,13 +5,15 @@ D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\Tokens.h(29,42): 
 D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\Tokens.h(66,38): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
 D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\Tokens.h(70,37): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
 D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\Tokens.h(213,28): warning C4244: 'return': conversion from 'int' to 'float', possible loss of data
-D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\ARITHMETICPARSING.h(22,21): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\ARITHMETICPARSING.h(87,29): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\ARITHMETICPARSING.h(23,21): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\ARITHMETICPARSING.h(29,13): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\ARITHMETICPARSING.h(100,29): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
 D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\StandardLibrary.h(193,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
 D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\StandardLibrary.h(430,49): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
 D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\StandardLibrary.h(437,45): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\OpenGLSeaSharkLibrary.h(526,31): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\OpenGLSeaSharkLibrary.h(578,18): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\OpenGLSeaSharkLibrary.h(581,18): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\OpenGLSeaSharkLibrary.h(161,1): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\OpenGLSeaSharkLibrary.h(537,31): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\OpenGLSeaSharkLibrary.h(589,18): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\OpenGLSeaSharkLibrary.h(592,18): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
 D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\FileWriter.h(174): warning C4715: 'writeFile': not all control paths return a value
   SeaSharkpp.vcxproj -> D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\x64\Debug\SeaSharkpp.exe

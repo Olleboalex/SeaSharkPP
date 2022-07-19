@@ -155,6 +155,11 @@ class Shader
 		int location = glGetUniformLocation(shaderProgram, id);
 		glUniform2f(location, fval, fval2);
 	}
+	void SetUniform(const char* id, vector<float> fvals)
+	{
+		int location = glGetUniformLocation(shaderProgram, id);
+		glUniform1fv(location, fvals.size(), &fvals[0]);
+	}
 
 	void Update()
 	{
@@ -181,11 +186,19 @@ Token checkInput(string key)
 		{
 			return Token(glfwGetKey(glfwGetCurrentContext(), key[0]) == GLFW_PRESS);
 		}
+		else if (key[0] >= '0' && key[0] <= '9')
+		{
+			return Token(glfwGetKey(glfwGetCurrentContext(), key[0]) == GLFW_PRESS);
+		}
 	}
 
 	if (key == "ESCAPE")
 	{
 		return Token(glfwGetKey(glfwGetCurrentContext(), GLFW_KEY_ESCAPE) == GLFW_PRESS);
+	}
+	else if (key == "SPACE")
+	{
+		return Token(glfwGetKey(glfwGetCurrentContext(), GLFW_KEY_SPACE) == GLFW_PRESS);
 	}
 	
 	return ErrorToken("That is not a valid key");
@@ -206,16 +219,14 @@ Token gl_INIT(Token MethodCall, unordered_map<string, method>* methods, unordere
 	return tokk;
 }
 
-/*Method creates a new shader and adds it to Shaders map*/
+/*Method creates a new shader and adds it to Shaders map with name according to given input*/
 Token gl_createShader(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
 {
 	Token nameToken = MethodCall.EvalStatement[0][0];
 	if (nameToken.ID == "STRING")
 	{
 		Shaders[nameToken.stringVal] = Shader(nameToken.stringVal.c_str());
-		Token tok;
-		tok.ID = "NORETURN";
-		return tok;
+		return nameToken;
 	}
 	else
 	{
@@ -615,7 +626,7 @@ Token gl_setmouseVisibility(Token MethodCall, unordered_map<string, method>* met
 		}
 		else
 		{
-			glfwSetInputMode(glfwGetCurrentContext(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+			glfwSetInputMode(glfwGetCurrentContext(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		}
 	}
 	else
@@ -707,6 +718,56 @@ Token gl_uniform2f(Token MethodCall, unordered_map<string, method>* methods, uno
 	}
 }
 
+/*Method sets the given uniform id in the given shader to the list of floats given*/
+Token gl_uniformarrayf(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+{
+	Token nameTok = MethodCall.EvalStatement[0][0];
+	if (nameTok.ID == "STRING")
+	{
+		Token idTok = MethodCall.EvalStatement[1][0];
+		Token ValTok = MethodCall.EvalStatement[2][0];
+		if (idTok.ID == "STRING")
+		{
+			if (ValTok.ID == "LIST")
+			{
+				if (Shaders.count(nameTok.stringVal))
+				{
+					vector<float> data;
+					for (int i = 0; i < ValTok.EvalStatement.size(); i++)
+					{
+						if (ValTok.EvalStatement[i][0].ID == "FLOAT" || ValTok.EvalStatement[i][0].ID == "INT")
+						{
+							data.push_back(ValTok.EvalStatement[i][0].GetTokenValueAsFloat());
+						}
+						else
+						{
+							return ErrorToken("All list elements must be of type float or int");
+						}
+					}
+					Shaders[nameTok.stringVal].SetUniform(idTok.stringVal.c_str(), data);
+					return noReturnToken();
+				}
+				else
+				{
+					return ErrorToken("That shader does not exist");
+				}
+			}
+			else
+			{
+				return ErrorToken("Third parameter in gl_uniformarrayf() call must be of type list");
+			}
+		}
+		else
+		{
+			return ErrorToken("Second parameter in gl_uniformarrayf() call must be of type string");
+		}
+	}
+	else
+	{
+		return ErrorToken("First parameter in gl_uniformarrayf() call must be of type string");
+	}
+}
+
 unordered_map<string, method> OpenGLSSMethods
 {
 	make_pair("gl_Init", method("gl_Init", vector<vector<Token>> (), vector<Token>(), &gl_INIT, true)),
@@ -726,4 +787,5 @@ unordered_map<string, method> OpenGLSSMethods
 	make_pair("gl_setmouseVisibility", method("gl_setmouseVisibility", vector<vector<Token>> {vector<Token>()}, vector<Token>(), &gl_setmouseVisibility, true)),
 	make_pair("gl_uniform1f", method("gl_uniform1f", vector<vector<Token>> {vector<Token>(), vector<Token>(), vector<Token>()}, vector<Token>(), &gl_uniform1f, true)),
 	make_pair("gl_uniform2f", method("gl_uniform2f", vector<vector<Token>> {vector<Token>(), vector<Token>(), vector<Token>(), vector<Token>()}, vector<Token>(), &gl_uniform2f, true)),
+	make_pair("gl_uniformarrayf", method("gl_uniformarrayf", vector<vector<Token>> {vector<Token>(), vector<Token>(), vector<Token>()}, vector<Token>(), &gl_uniformarrayf, true)),
 };

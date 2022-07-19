@@ -15,18 +15,31 @@ Token ParseMethodCall(Token MethodCall, unordered_map<string, method>* methods, 
 
 Token ParseArithmeticPLUSMINUS(vector<Token> tokens)
 {
+	int cursor = 1;
 	string ID = "INT";
 	float result = 0;
 	if (tokens[0].ID == "INT")
 	{
 		result = tokens[0].intVal;
 	}
+	else if (tokens[0].ID == "MINUS")
+	{
+		if (tokens[1].ID == "INT")
+		{
+			result = -tokens[1].intVal;
+		}
+		else
+		{
+			result = -tokens[1].floatVal;
+			ID = "FLOAT";
+		}
+		cursor++;
+	}
 	else
 	{
 		result = tokens[0].floatVal;
 		ID = "FLOAT";
 	}
-	int cursor = 1;
 	while (cursor < tokens.size())
 	{
 		if (tokens[cursor].ID == "PLUS")
