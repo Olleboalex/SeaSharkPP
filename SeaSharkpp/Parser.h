@@ -9,6 +9,7 @@
 #include "StandardLibrary.h"
 #include "FileWriter.h"
 #include "OpenGLSeaSharkLibrary.h"
+#include "irrKlangSeaShark.h"
 
 #define TOK vector<Token>
 
@@ -27,7 +28,8 @@ unordered_map<string, Token> VARIABLES;
 unordered_map<string, unordered_map<string, method>> ContainedLibraries{
 	make_pair("System", SystemMETHODS),
 	make_pair("FileWriter", FileWriterMETHODS),
-	make_pair("OpenGL", OpenGLSSMethods)
+	make_pair("OpenGL", OpenGLSSMethods),
+	make_pair("IrrKlang", irrKlangMethods)
 };
 
 /*
@@ -59,7 +61,7 @@ Token SystemMethod(Token MethodCall, unordered_map<string, method>* methods, uno
 	return Token();
 }
 
-string libPath = "";
+string libPath = "D:\\VisualStudioProjects\\SeaSharkPLUSPLUS\\SeaSharkPP\\SeaSharkpp\\x64\\Debug\\";
 
 Token ParseLib(vector<Token> tokens, unordered_map<string, method>* methods)
 {
@@ -151,35 +153,35 @@ Token ParseMethodCall(Token MethodCall, unordered_map<string, method>* methods, 
 	}
 	else if ((*methods)[MethodCall.NAME].fromLib)
 	{
-		unordered_map<string, Token> funcVariables = VARIABLES;
-		for (int i = 0; i < (*methods)[MethodCall.NAME].Parameters.size(); i++)
-		{
-			vector<Token> token = { MethodCall.EvalStatement[i] };
-			funcVariables[(*methods)[MethodCall.NAME].Parameters[i][0].NAME] = Parse(token, methods, Variables);
-		}
-		Token tok = Parse((*methods)[MethodCall.NAME].ExecutionStatements, methods, &funcVariables);
-		return tok;
+	unordered_map<string, Token> funcVariables = VARIABLES;
+	for (int i = 0; i < (*methods)[MethodCall.NAME].Parameters.size(); i++)
+	{
+		vector<Token> token = { MethodCall.EvalStatement[i] };
+		funcVariables[(*methods)[MethodCall.NAME].Parameters[i][0].NAME] = Parse(token, methods, Variables);
+	}
+	Token tok = Parse((*methods)[MethodCall.NAME].ExecutionStatements, methods, &funcVariables);
+	return tok;
 	}
 	else
 	{
-		unordered_map<string, Token> funcVariables = VARIABLES;
-		for (int i = 0; i < (*methods)[MethodCall.NAME].Parameters.size(); i++)
+	unordered_map<string, Token> funcVariables = VARIABLES;
+	for (int i = 0; i < (*methods)[MethodCall.NAME].Parameters.size(); i++)
+	{
+		vector<Token> token = { MethodCall.EvalStatement[i] };
+		funcVariables[(*methods)[MethodCall.NAME].Parameters[i][0].NAME] = Parse(token, methods, Variables);
+	}
+	Token tok = Parse((*methods)[MethodCall.NAME].ExecutionStatements, methods, &funcVariables);
+	for (pair<string, Token> element : funcVariables)
+	{
+		if (VARIABLES.count(element.first))
 		{
-			vector<Token> token = { MethodCall.EvalStatement[i] };
-			funcVariables[(*methods)[MethodCall.NAME].Parameters[i][0].NAME] = Parse(token, methods, Variables);
-		}
-		Token tok = Parse((*methods)[MethodCall.NAME].ExecutionStatements, methods, &funcVariables);
-		for (pair<string, Token> element : funcVariables)
-		{
-			if (VARIABLES.count(element.first))
+			if (!CheckIfNameIsContained((*methods)[MethodCall.NAME].Parameters, element.first))
 			{
-				if (!CheckIfNameIsContained((*methods)[MethodCall.NAME].Parameters, element.first))
-				{
-					VARIABLES[element.first] = element.second;
-				}
+				VARIABLES[element.first] = element.second;
 			}
 		}
-		return tok;
+	}
+	return tok;
 	}
 }
 
@@ -226,6 +228,40 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 		else if (tokens[cursor].ID == "IF")
 		{
 			Token boolTok = ParseBool(tokens[cursor].EvalStatement[0], methods, Variables);
+			vector<Token> result;
+
+			Token ifToken = tokens[cursor];
+
+			if (cursor < tokens.size() - 1)
+			{
+				if (tokens[cursor + 1].ID == "ELSE")
+				{
+					result = tokens[cursor + 1].ExecStatement;
+					cursor++;
+				}
+				else if (tokens[cursor + 1].ID == "ELIF")
+				{
+					Token tok;
+					tok.ID = "IF";
+					tok.EvalStatement = tokens[cursor + 1].EvalStatement;
+					tok.ExecStatement = tokens[cursor + 1].ExecStatement;
+					result.push_back(tok);
+					cursor += 2;
+					while (cursor < tokens.size())
+					{
+						if (tokens[cursor].ID == "ELIF" || tokens[cursor].ID == "ELSE")
+						{
+							result.push_back(tokens[cursor]);
+							cursor++;
+						}
+						else
+						{
+							cursor--;
+							break;
+						}
+					}
+				}
+			}
 
 			if (boolTok.ID == "ERROR")
 			{
@@ -241,22 +277,25 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 
 			if (boolTok.boolVal)
 			{
-				Token tok = Parse(tokens[cursor].ExecStatement, methods, Variables);
-				if (cursor < tokens.size() - 1 && tokens[cursor + 1].ID == "ELSE") cursor++;
+				Token tok = Parse(ifToken.ExecStatement, methods, Variables);
 				if (tok.ID != "NORETURN") return tok;
 			}
 			else
 			{
-				if (cursor < tokens.size() - 1 && tokens[cursor + 1].ID == "ELSE")
-				{
-					Token tok = Parse(tokens[cursor + 1].ExecStatement, methods, Variables);
-					cursor++;
-					if (tok.ID != "NORETURN") return tok;
-				}
+				Token res = Parse(result, methods, Variables);
+				if (res.ID != "NORETURN") return res;
 			}
 		}
 		else if (tokens[cursor].ID == "ELSE")
 		{
+			Token errorToken;
+			errorToken.ID = "ERROR";
+			errorToken.NAME = "Could not find if statement";
+			return errorToken;
+		}
+		else if (tokens[cursor].ID == "ELIF")
+		{
+		cout << "HERE";
 			Token errorToken;
 			errorToken.ID = "ERROR";
 			errorToken.NAME = "Could not find if statement";

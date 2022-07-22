@@ -7,6 +7,48 @@
 #include <string>
 #include <time.h>
 
+bool compareTokens(Token a, Token b)
+{
+	if (a.ID == b.ID)
+	{
+		if (a.ID == "STRING")
+		{
+			return a.stringVal == b.stringVal;
+		}
+		else if (a.ID == "INT")
+		{
+			return a.intVal == b.intVal;
+		}
+		else if (a.ID == "FLOAT")
+		{
+			return a.floatVal == b.floatVal;
+		}
+		else if (a.ID == "BOOL")
+		{
+			return a.boolVal == b.boolVal;
+		}
+		else if (a.ID == "LIST")
+		{
+			if (a.EvalStatement.size() == b.EvalStatement.size())
+			{
+				for (int i = 0; i < a.EvalStatement.size(); i++)
+				{
+					if (!compareTokens(a.EvalStatement[i][0], b.EvalStatement[i][0]))
+					{
+						return false;
+					}
+				}
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
+	return false;
+}
+
 Token print(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
 {
 	if (MethodCall.EvalStatement.size() == 1)
@@ -254,6 +296,33 @@ Token append(Token MethodCall, unordered_map<string, method>* methods, unordered
 		return errorToken;
 	}
 }
+Token appendmultiple(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+{
+	Token listToken = MethodCall.EvalStatement[0][0];
+	if (listToken.ID == "LIST")
+	{
+		Token appendToken = MethodCall.EvalStatement[1][0];
+		if(appendToken.ID == "LIST")
+		{
+			for (int i = 0; i < appendToken.EvalStatement.size(); i++)
+			{
+				listToken.EvalStatement.push_back(appendToken.EvalStatement[i]);
+			}
+			return listToken;
+		}
+		else
+		{
+			return ErrorToken("Second parameter in appendmultiple() call must be of type list");
+		}
+	}
+	else
+	{
+		Token errorToken;
+		errorToken.ID = "ERROR";
+		errorToken.NAME = "First parameter in appendmultiple() must be of type list";
+		return errorToken;
+	}
+}
 Token get(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
 {
 	Token listToken = MethodCall.EvalStatement[0][0];
@@ -445,6 +514,52 @@ Token size(Token MethodCall, unordered_map<string, method>* methods, unordered_m
 		return errorToken;
 	}
 }
+Token contains(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+{
+	Token listToken = MethodCall.EvalStatement[0][0];
+	if (listToken.ID == "LIST")
+	{
+		Token checkToken = MethodCall.EvalStatement[1][0];
+		for (int i = 0; i < listToken.EvalStatement.size(); i++)
+		{
+			if (compareTokens(listToken.EvalStatement[i][0], checkToken))
+			{
+				return Token(true);
+			}
+		}
+		return Token(false);
+	}
+	else if (listToken.ID == "STRING")
+	{
+		Token charToken = MethodCall.EvalStatement[1][0];
+		if (charToken.ID == "STRING")
+		{
+			if (charToken.stringVal.size() == 1)
+			{
+				for (int i = 0; i < listToken.stringVal.size(); i++)
+				{
+					if (listToken.stringVal[i] == charToken.stringVal[0])
+					{
+						return Token(true);
+					}
+				}
+				return Token(false);
+			}
+			else
+			{
+				return ErrorToken("Second parameter in contains() call when string must be a single character");
+			}
+		}
+		else
+		{
+			return ErrorToken("Cant compare string values to any other type");
+		}
+	}
+	else
+	{
+		return ErrorToken("First parameter in contains() call must be of type list or string");
+	}
+}
 
 unordered_map<string, method> SystemMETHODS
 {
@@ -456,8 +571,10 @@ unordered_map<string, method> SystemMETHODS
 	make_pair("string", method("string", vector<vector<Token>> {vector<Token>()}, vector<Token>(), &String, true)),
 	make_pair("random", method("random", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), &random, true)),
 	make_pair("append", method("append", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), &append, true)),
+	make_pair("appendmultiple", method("appendmultiple", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), &appendmultiple, true)),
 	make_pair("get", method("get", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), &get, true)),
 	make_pair("set", method("set", vector<vector<Token>> {vector<Token>(), vector<Token>(), vector<Token>()}, vector<Token>(), &set, true)),
 	make_pair("remove", method("remove", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), &remove, true)),
-	make_pair("size", method("size", vector<vector<Token>> {vector<Token>()}, vector<Token>(), &size, true))
+	make_pair("size", method("size", vector<vector<Token>> {vector<Token>()}, vector<Token>(), &size, true)),
+	make_pair("contains", method("contains", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), &contains, true))
 };

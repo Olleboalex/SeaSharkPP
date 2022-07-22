@@ -244,6 +244,7 @@ struct method
 			Parameters = params;
 			ExecutionStatements = exec;
 			SystemMethod = false;
+			fromLib = false;
 		}
 		method(string name, vector<vector<Token>> params, vector<Token> exec, Token(*function)(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables), bool systemMethod)
 		{

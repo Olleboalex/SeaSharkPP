@@ -74,6 +74,10 @@
     <IncludePath>D:\OPENGLCPPLIBRARY\INCLUDE;$(IncludePath)</IncludePath>
     <LibraryPath>D:\OPENGLCPPLIBRARY\LIB;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>D:\OPENGLCPPLIBRARY\INCLUDE;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\OPENGLCPPLIBRARY\LIB;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -112,7 +116,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;irrKlang.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -129,6 +133,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;irrKlang.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -138,6 +143,7 @@
   <ItemGroup>
     <ClInclude Include="ARITHMETICPARSING.h" />
     <ClInclude Include="FileWriter.h" />
+    <ClInclude Include="irrKlangSeaShark.h" />
     <ClInclude Include="Lexer.h" />
     <ClInclude Include="OpenGLSeaSharkLibrary.h" />
     <ClInclude Include="Parser.h" />

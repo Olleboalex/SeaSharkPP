@@ -96,6 +96,41 @@ vector<Token> LexText(string Text)
 				tok.ExecStatement = LexText(content);
 				tokens.push_back(tok);
 			}
+			else if (cursor < Text.size() - 3 && Text[cursor] == 'e' && Text[cursor + 1] == 'l' && Text[cursor + 2] == 'i' && Text[cursor + 3] == 'f')
+			{
+				cursor += 3;
+				int parans = 1;
+				while (Text[cursor] != '(')
+				{
+					cursor++;
+				}
+				cursor++;
+				string evalText = "";
+				while (cursor < Text.size())
+				{
+					if (Text[cursor] == '(') parans++;
+					if (Text[cursor] == ')') parans--;
+					if (parans == 0) break;
+					evalText += Text[cursor];
+					cursor++;
+				}
+				while (Text[cursor] != '{')
+				{
+					cursor++;
+				}
+				cursor++;
+				int curlyBracks = 1;
+				string execText = "";
+				while (cursor < Text.size())
+				{
+					if (Text[cursor] == '{') curlyBracks++;
+					if (Text[cursor] == '}') curlyBracks--;
+					if (curlyBracks == 0) break;
+					execText += Text[cursor];
+					cursor++;
+				}
+				tokens.push_back(Token("ELIF", LexText(evalText), LexText(execText)));
+			}
 			else if (cursor < Text.size() - 4 && Text[cursor] == 'w' && Text[cursor + 1] == 'h' && Text[cursor + 2] == 'i' && Text[cursor + 3] == 'l' && Text[cursor + 4] == 'e')
 			{
 				cursor += 4;
