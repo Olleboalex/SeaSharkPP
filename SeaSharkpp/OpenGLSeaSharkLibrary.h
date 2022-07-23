@@ -155,6 +155,11 @@ class Shader
 		int location = glGetUniformLocation(shaderProgram, id);
 		glUniform2f(location, fval, fval2);
 	}
+	void SetUniform(const char* id, float fval, float fval2, float fval3)
+	{
+		int location = glGetUniformLocation(shaderProgram, id);
+		glUniform3f(location, fval, fval2, fval3);
+	}
 	void SetUniform(const char* id, vector<float> fvals)
 	{
 		int location = glGetUniformLocation(shaderProgram, id);
@@ -614,7 +619,7 @@ Token gl_setmousePosition(Token MethodCall, unordered_map<string, method>* metho
 	}
 }
 
-/*Method sets the visibility of the cursor input is bool*/
+/*Method sets the visibility of the cursor, input is bool*/
 Token gl_setmouseVisibility(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
 {
 	Token input = MethodCall.EvalStatement[0][0];
@@ -717,6 +722,58 @@ Token gl_uniform2f(Token MethodCall, unordered_map<string, method>* methods, uno
 		return ErrorToken("First parameter in gl_uniform2f() call must be of type string");
 	}
 }
+Token gl_uniform3f(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+{
+	Token nameTok = MethodCall.EvalStatement[0][0];
+	if (nameTok.ID == "STRING")
+	{
+		Token idTok = MethodCall.EvalStatement[1][0];
+		Token ValTok1 = MethodCall.EvalStatement[2][0];
+		Token ValTok2 = MethodCall.EvalStatement[3][0];
+		Token ValTok3 = MethodCall.EvalStatement[4][0];
+		if (idTok.ID == "STRING")
+		{
+			if (ValTok1.ID == "FLOAT" || ValTok1.ID == "INT")
+			{
+				if (ValTok2.ID == "FLOAT" || ValTok2.ID == "INT")
+				{
+					if (ValTok3.ID == "FLOAT" || ValTok3.ID == "INT")
+					{
+						if (Shaders.count(nameTok.stringVal))
+						{
+							Shaders[nameTok.stringVal].SetUniform(idTok.stringVal.c_str(), ValTok1.GetTokenValueAsFloat(), ValTok2.GetTokenValueAsFloat(), ValTok3.GetTokenValueAsFloat());
+							return noReturnToken();
+						}
+						else
+						{
+							return ErrorToken("That shader does not exist");
+						}
+					}
+					else
+					{
+						return ErrorToken("Fifth parameter in gl_uniform3f() call must be of type int or float");
+					}
+				}
+				else
+				{
+					return ErrorToken("Fourth parameter in gl_uniform3f() call must be of type int or float");
+				}
+			}
+			else
+			{
+				return ErrorToken("Third parameter in gl_uniform3f() call must be of type int or float");
+			}
+		}
+		else
+		{
+			return ErrorToken("Second parameter in gl_uniform3f() call must be of type string");
+		}
+	}
+	else
+	{
+		return ErrorToken("First parameter in gl_uniform3f() call must be of type string");
+	}
+}
 
 /*Method sets the given uniform id in the given shader to the list of floats given*/
 Token gl_uniformarrayf(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
@@ -787,5 +844,6 @@ unordered_map<string, method> OpenGLSSMethods
 	make_pair("gl_setmouseVisibility", method("gl_setmouseVisibility", vector<vector<Token>> {vector<Token>()}, vector<Token>(), &gl_setmouseVisibility, true)),
 	make_pair("gl_uniform1f", method("gl_uniform1f", vector<vector<Token>> {vector<Token>(), vector<Token>(), vector<Token>()}, vector<Token>(), &gl_uniform1f, true)),
 	make_pair("gl_uniform2f", method("gl_uniform2f", vector<vector<Token>> {vector<Token>(), vector<Token>(), vector<Token>(), vector<Token>()}, vector<Token>(), &gl_uniform2f, true)),
+	make_pair("gl_uniform3f", method("gl_uniform3f", vector<vector<Token>> {vector<Token>(), vector<Token>(), vector<Token>(), vector<Token>(), vector<Token>()}, vector<Token>(), &gl_uniform3f, true)),
 	make_pair("gl_uniformarrayf", method("gl_uniformarrayf", vector<vector<Token>> {vector<Token>(), vector<Token>(), vector<Token>()}, vector<Token>(), &gl_uniformarrayf, true)),
 };

@@ -528,6 +528,7 @@ vector<Token> LexText(string Text)
 					{
 						cursor++;
 						int parans = 1;
+						int brackets = 0;
 						string paramText = "";
 						vector<vector<Token>> params;
 						while (Text[cursor] == ' ')
@@ -538,8 +539,10 @@ vector<Token> LexText(string Text)
 						{
 							if (Text[cursor] == '(') parans++;
 							if (Text[cursor] == ')') parans--;
+							if (Text[cursor] == '[') brackets++;
+							if (Text[cursor] == ']') brackets--;
 							if (parans == 0) break;
-							if (Text[cursor] == ',' && parans == 1)
+							if (Text[cursor] == ',' && parans == 1 && brackets == 0)
 							{
 								params.push_back(LexText(paramText));
 								paramText = "";
