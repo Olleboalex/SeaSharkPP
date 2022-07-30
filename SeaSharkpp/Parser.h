@@ -9,7 +9,7 @@
 #include "StandardLibrary.h"
 #include "FileWriter.h"
 #include "OpenGLSeaSharkLibrary.h"
-#include "irrKlangSeaShark.h"
+//#include "irrKlangSeaShark.h"
 
 #define TOK vector<Token>
 
@@ -29,7 +29,7 @@ unordered_map<string, unordered_map<string, method>> ContainedLibraries{
 	make_pair("System", SystemMETHODS),
 	make_pair("FileWriter", FileWriterMETHODS),
 	make_pair("OpenGL", OpenGLSSMethods),
-	make_pair("IrrKlang", irrKlangMethods)
+	//make_pair("IrrKlang", irrKlangMethods)
 };
 
 /*
@@ -61,7 +61,7 @@ Token SystemMethod(Token MethodCall, unordered_map<string, method>* methods, uno
 	return Token();
 }
 
-string libPath = "D:\\VisualStudioProjects\\SeaSharkPLUSPLUS\\SeaSharkPP\\SeaSharkpp\\x64\\Debug\\";
+string libPath = "./";
 
 Token ParseLib(vector<Token> tokens, unordered_map<string, method>* methods)
 {
@@ -295,7 +295,6 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 		}
 		else if (tokens[cursor].ID == "ELIF")
 		{
-		cout << "HERE";
 			Token errorToken;
 			errorToken.ID = "ERROR";
 			errorToken.NAME = "Could not find if statement";
@@ -319,7 +318,7 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 			while (run.boolVal)
 			{
 				Token tok = Parse(tokens[cursor].ExecStatement, methods, Variables);
-				//if (tok.ID != "NORETURN") return tok;
+				if (tok.ID != "NORETURN") return tok;
 				if (tok.ID == "ERROR") return tok;
 				run = ParseBool(tokens[cursor].EvalStatement[0], methods, Variables);
 				if (run.ID == "ERROR")

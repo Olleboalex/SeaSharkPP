@@ -8,15 +8,18 @@
 #include <unordered_map>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <irrKlang/irrKlang.h>
+//#include <irrKlang/irrKlang.h>
 
 using namespace std;
 
-string codePath = "D:\\VisualStudioProjects\\SeaSharkPLUSPLUS\\SeaSharkPP\\SeaSharkpp\\x64\\Debug\\code.ss";
+string codePath = "";
+
+string version = "1.1";
 
 
 int main(int argc, char** argv)
 {
+
 	if (argc >= 2)
 	{
 		codePath = argv[1];
@@ -24,7 +27,7 @@ int main(int argc, char** argv)
 		int val = 0;
 		for (int i = string(argv[1]).size() - 1; i >= 0; i--)
 		{
-			if (argv[1][i] == '\\')
+			if (argv[1][i] == '/')
 			{
 				val = i;
 				break;
@@ -35,6 +38,11 @@ int main(int argc, char** argv)
 			temp += argv[1][i];
 		}
 		libPath = temp;
+	}
+	else
+	{
+		cout << "SeaShark version " << version << endl;
+		return 0;
 	}
 
 	fstream file;
@@ -48,6 +56,11 @@ int main(int argc, char** argv)
 			code += line + '\n';
 		}
 		file.close();
+	}
+	else
+	{
+		cout << "Failed to find file at: " << codePath << endl;
+		return 0;
 	}
 
 	vector<Token> tokens = LexText(code);
