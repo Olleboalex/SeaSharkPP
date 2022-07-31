@@ -299,6 +299,42 @@ vector<Token> LexText(string Text)
 				tok.NAME = name;
 				tokens.push_back(tok);
 			}
+			else if (cursor < Text.size() - 5 && Text[cursor] == 's' && Text[cursor + 1] == 't' && Text[cursor + 2] == 'r' && Text[cursor + 3] == 'u' && Text[cursor + 4] == 'c' && Text[cursor + 5] == 't')
+			{
+				cursor += 6;
+
+				while(Text[cursor] == ' ')
+				{
+					cursor++;
+				}
+				string NameText = "";
+				while(cursor < Text.size())
+				{
+					if (Text[cursor] == ' ') break;
+					if (Text[cursor] == '\t') break;
+					if (Text[cursor] == '\n') break;
+					if (Text[cursor] == '{') break;
+					NameText += Text[cursor];
+					cursor++;
+				}
+				while(Text[cursor] != '{')
+				{
+					cursor++;
+				}
+				cursor++;
+				string propertiesText = "";
+				while(cursor < Text.size())
+				{
+					if (Text[cursor] == '}') break;
+					propertiesText += Text[cursor];
+					cursor++;
+				}
+				Token tok;
+				tok.ID = "STRUCT";
+				tok.NAME = NameText;
+				tok.ExecStatement = LexText(propertiesText);
+				tokens.push_back(tok);
+			}
 			else if (cursor < Text.size() - 4 && Text[cursor] == 'u' && Text[cursor + 1] == 's' && Text[cursor + 2] == 'i' && Text[cursor + 3] == 'n' && Text[cursor + 4] == 'g')
 			{
 				cursor += 5;

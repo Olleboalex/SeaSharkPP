@@ -4,7 +4,7 @@ C:\Users\ealegus\source\repos\SeaSharkPP\SeaSharkpp\Tokens.h(22,43): warning C42
 C:\Users\ealegus\source\repos\SeaSharkPP\SeaSharkpp\Tokens.h(29,42): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
 C:\Users\ealegus\source\repos\SeaSharkPP\SeaSharkpp\Tokens.h(66,38): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
 C:\Users\ealegus\source\repos\SeaSharkPP\SeaSharkpp\Tokens.h(70,37): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
-C:\Users\ealegus\source\repos\SeaSharkPP\SeaSharkpp\Tokens.h(213,28): warning C4244: 'return': conversion from 'int' to 'float', possible loss of data
+C:\Users\ealegus\source\repos\SeaSharkPP\SeaSharkpp\Tokens.h(214,28): warning C4244: 'return': conversion from 'int' to 'float', possible loss of data
 C:\Users\ealegus\source\repos\SeaSharkPP\SeaSharkpp\ARITHMETICPARSING.h(23,21): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
 C:\Users\ealegus\source\repos\SeaSharkPP\SeaSharkpp\ARITHMETICPARSING.h(29,13): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
 C:\Users\ealegus\source\repos\SeaSharkPP\SeaSharkpp\ARITHMETICPARSING.h(100,29): warning C4244: '=': conversion from 'int' to 'float', possible loss of data

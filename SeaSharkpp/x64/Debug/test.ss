@@ -1,13 +1,21 @@
 using System
 
-def test()
+struct test
 {
-	return "Hello World!"
+	value = 5
+	check = true
+	def hello()
+	{
+		return "Hello World"
+	}
 }
 
-i = 0
-while(i < test().size())
+a = test()
+a = a.set("value", 100)
+a = a.set("check", false)
+
+if(!a.check)
 {
-	printline(test().get(i))
-	i++
+	printline(a.hello())
+	printline(a.value)
 }

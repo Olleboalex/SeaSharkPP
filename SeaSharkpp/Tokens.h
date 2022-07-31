@@ -89,6 +89,7 @@ struct Token
 		string NAME;
 		vector<vector<Token>> EvalStatement;
 		vector<Token> ExecStatement;
+		unordered_map<string, Token> structVars;
 
 		// Input is single char operator
 		// Constructor assigns values
