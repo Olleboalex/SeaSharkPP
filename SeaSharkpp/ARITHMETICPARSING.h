@@ -217,21 +217,54 @@ Token ParseArithmetic(vector<Token> tokens, unordered_map<string, method>* metho
 	{
 		if (tokens[cursor].ID == "VAR")
 		{
-			Token tok = (*Variables)[tokens[cursor].NAME];
-			if (tok.ID != "INT" && tok.ID != "FLOAT")
+			if(cursor < tokens.size() - 1 && tokens[cursor + 1].ID == "DOT")
 			{
-				Token errorTok;
-				errorTok.ID = "ERROR";
-				errorTok.NAME = "Cant do arithmetic on strings and numbers";
-				return errorTok;
+				cursor++;
+				Token tok = Parse(vector<Token> {tokens[cursor - 1], tokens[cursor]}, methods, Variables);
+				if (tok.ID != "INT" && tok.ID != "FLOAT")
+				{
+					Token errorTok;
+					errorTok.ID = "ERROR";
+					errorTok.NAME = "Cant do arithmetic on strings and numbers";
+					return errorTok;
+				}
+				resultTokens.push_back(tok);
 			}
-			resultTokens.push_back(tok);
+			else 
+			{
+				Token tok = (*Variables)[tokens[cursor].NAME];
+				if (tok.ID != "INT" && tok.ID != "FLOAT")
+				{
+					cout << tok.ID << endl;
+					Token errorTok;
+					errorTok.ID = "ERROR";
+					errorTok.NAME = "Cant do arithmetic on strings and numbers";
+					return errorTok;
+				}
+				resultTokens.push_back(tok);
+			}
 		}
 		else if (tokens[cursor].ID == "METHOD")
 		{
-			Token tok = ParseMethodCall(tokens[cursor], methods, Variables);
-			if (tok.ID == "ERROR") return tok;
-			resultTokens.push_back(tok);
+			if (cursor < tokens.size() - 1 && tokens[cursor + 1].ID == "DOT")
+			{
+				cursor++;
+				Token tok = Parse(vector<Token> {tokens[cursor - 1], tokens[cursor]}, methods, Variables);
+				if (tok.ID != "INT" && tok.ID != "FLOAT")
+				{
+					Token errorTok;
+					errorTok.ID = "ERROR";
+					errorTok.NAME = "Cant do arithmetic on strings and numbers";
+					return errorTok;
+				}
+				resultTokens.push_back(tok);
+			}
+			else
+			{
+				Token tok = ParseMethodCall(tokens[cursor], methods, Variables);
+				if (tok.ID == "ERROR") return tok;
+				resultTokens.push_back(tok);
+			}
 		}
 		else
 		{
@@ -351,6 +384,20 @@ Token ParseBool(vector<Token> tokens, unordered_map<string, method>* methods, un
 			}
 		}
 	}
+
+	if(tokens.size() <= 3)
+	{
+		if(tokens[tokens.size() - 1].ID == "DOT")
+		{
+			Token tok = Parse(vector<Token> {tokens[tokens.size() - 2], tokens[tokens.size() - 1]}, methods, Variables);
+			if (tok.ID == "ERROR") return tok;
+			tokens.erase(tokens.begin() + tokens.size() - 1);
+			tokens.erase(tokens.begin() + tokens.size() - 1);
+			tokens.push_back(tok);
+			return ParseBool(tokens, methods, Variables);
+		}
+	}
+
 	bool Equals = true;
 	string comparisor;
 	TOK LSide;

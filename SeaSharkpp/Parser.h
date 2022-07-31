@@ -36,7 +36,8 @@ unordered_map<string, method> METHODS;
 unordered_map<string, Token> VARIABLES;
 
 unordered_map<string, Properties> props{
-	make_pair("LIST", Properties(listMethods, unordered_map<string, Token>()))
+	make_pair("LIST", Properties(listMethods, unordered_map<string, Token>())),
+	make_pair("STRING", Properties(listMethods, unordered_map<string, Token>()))
 };
 
 unordered_map<string, unordered_map<string, method>> ContainedLibraries{
@@ -674,7 +675,7 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 							{
 								Token tok = props[objTok.ID].VARIABLES[propTok.NAME];
 								if (tok.ID == "ERROR") return tok;
-								if (tokens.size() == 1) return tok;
+								if (tokens.size() == 2) return tok;
 							}
 							else
 							{
@@ -686,8 +687,9 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 							if(props[objTok.ID].METHODS.count(propTok.NAME))
 							{
 								propTok.EvalStatement.insert(propTok.EvalStatement.begin(), vector<Token>{objTok});
-								Token tok = ParseMethodCall(propTok, &props[objTok.ID].METHODS, &props[objTok.ID].VARIABLES);
-								if(tok.ID != "NORETURN") return tok;
+								Token tok = ParseMethodCall(propTok, &props[objTok.ID].METHODS, Variables);
+								if (tok.ID == "ERROR") return tok;
+								if (tokens.size() == 2) return tok;
 							}
 							else
 							{

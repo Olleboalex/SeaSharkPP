@@ -494,7 +494,11 @@ vector<Token> LexText(string Text)
 						if(Text[cursor] == ' ') break;
 						if(Text[cursor] == '\n') break;
 						if(Text[cursor] == '\t') break;
-						if(mathOperators.count(Text[cursor]) && Text[cursor] != ')') break;
+						if(mathOperators.count(Text[cursor]) && Text[cursor] != ')')
+						{
+							cursor++;
+							break;
+						}
 					}
 					propCall += Text[cursor];
 					cursor++;
