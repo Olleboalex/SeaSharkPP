@@ -480,6 +480,30 @@ vector<Token> LexText(string Text)
 					cursor++;
 				}
 			}
+			else if (Text[cursor] == '.')
+			{
+				cursor++;
+				string propCall = "";
+				int parans = 0;
+				while(cursor < Text.size())
+				{
+					if(Text[cursor] == '(') parans++;
+					if(Text[cursor] == ')') parans--;
+					if(parans == 0)
+					{
+						if(Text[cursor] == ' ') break;
+						if(Text[cursor] == '\n') break;
+						if(Text[cursor] == '\t') break;
+						if(mathOperators.count(Text[cursor]) && Text[cursor] != ')') break;
+					}
+					propCall += Text[cursor];
+					cursor++;
+				}
+				Token tok;
+				tok.ID = "DOT";
+				tok.ExecStatement = LexText(propCall);
+				tokens.push_back(tok);
+			}
 			else
 			{
 				if (IsDigit(Text[cursor]) || mathOperators.count(Text[cursor]))
@@ -513,6 +537,11 @@ vector<Token> LexText(string Text)
 							break;
 						}
 						if (mathOperators.count(Text[cursor]))
+						{
+							cursor--;
+							break;
+						}
+						if (Text[cursor] == '.')
 						{
 							cursor--;
 							break;

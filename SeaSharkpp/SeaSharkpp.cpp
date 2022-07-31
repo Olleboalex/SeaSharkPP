@@ -12,9 +12,9 @@
 
 using namespace std;
 
-string codePath = "";
+string codePath = "test.ss";
 
-string version = "1.1";
+string version = "2.0";
 
 
 int main(int argc, char** argv)

@@ -21,9 +21,23 @@ unordered_set<string> MathIDS{
 	"DECREMENT", "PLUSEQUALS", "MINUSEQUALS", "MULTIPLYEQUALS", "DIVIDEEQUALS", "NOT"
 };
 
+unordered_map<string, method> listMethods{
+	make_pair("append", method("append", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), &append, true)),
+	make_pair("appendmultiple", method("appendmultiple", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), &appendmultiple, true)),
+	make_pair("get", method("get", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), &get, true)),
+	make_pair("set", method("set", vector<vector<Token>> {vector<Token>(), vector<Token>(), vector<Token>()}, vector<Token>(), &set, true)),
+	make_pair("remove", method("remove", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), &remove, true)),
+	make_pair("size", method("size", vector<vector<Token>> {vector<Token>()}, vector<Token>(), &size, true)),
+	make_pair("contains", method("contains", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), &contains, true))
+};
+
 unordered_map<string, method> METHODS;
 
 unordered_map<string, Token> VARIABLES;
+
+unordered_map<string, Properties> props{
+	make_pair("LIST", Properties(listMethods, unordered_map<string, Token>()))
+};
 
 unordered_map<string, unordered_map<string, method>> ContainedLibraries{
 	make_pair("System", SystemMETHODS),
@@ -624,6 +638,80 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 			if (tokens.size() == 1)
 			{
 				return tok;
+			}
+		}
+		else if(tokens[cursor].ID == "DOT")
+		{
+			if(cursor > 0)
+			{
+				Token objTok = tokens[cursor - 1];
+				string relevantID = "";
+				if(objTok.ID == "VAR")
+				{
+					if((*Variables).count(objTok.NAME))
+					{
+						objTok = (*Variables)[objTok.NAME];
+					}
+					else
+					{
+						return ErrorToken("That variable does not exist");
+					}
+				}
+				else if(objTok.ID == "METHOD")
+				{
+					objTok = ParseMethodCall(objTok, methods, Variables);
+					if(objTok.ID == "ERROR") return objTok;
+				}
+
+				if(props.count(objTok.ID))
+				{
+					if(tokens[cursor].ExecStatement.size() == 1)
+					{
+						Token propTok = tokens[cursor].ExecStatement[0];
+						if(propTok.ID == "VAR")
+						{
+							if(props[objTok.ID].VARIABLES.count(propTok.NAME))
+							{
+								Token tok = props[objTok.ID].VARIABLES[propTok.NAME];
+								if (tok.ID == "ERROR") return tok;
+								if (tokens.size() == 1) return tok;
+							}
+							else
+							{
+								return ErrorToken("That property does not exist");
+							}
+						}
+						else if(propTok.ID == "METHOD")
+						{
+							if(props[objTok.ID].METHODS.count(propTok.NAME))
+							{
+								propTok.EvalStatement.insert(propTok.EvalStatement.begin(), vector<Token>{objTok});
+								Token tok = ParseMethodCall(propTok, &props[objTok.ID].METHODS, &props[objTok.ID].VARIABLES);
+								if(tok.ID != "NORETURN") return tok;
+							}
+							else
+							{
+								return ErrorToken("That property does not exist");
+							}
+						}
+						else
+						{
+							return ErrorToken("That is an incorrect property call");
+						}
+					}
+					else
+					{
+						return ErrorToken("That is an incorrect property call");
+					}
+				}
+				else
+				{
+					return ErrorToken("That structure has no properties");
+				}
+			}
+			else
+			{
+				return ErrorToken("Property call must be applied to an object");
 			}
 		}
 		else if (tokens[cursor].ID == "RETURN")

@@ -278,3 +278,23 @@ struct method
 			SystemMethod = false;
 		}
 };
+
+/*
+When calling on method in Properties first parameter supplied is always the object called on
+*/
+struct Properties
+{
+	public:
+		unordered_map<string, method> METHODS;
+		unordered_map<string, Token> VARIABLES;
+
+		Properties(unordered_map<string, method> methods, unordered_map<string, Token> vars)
+		{
+			METHODS = methods;
+			VARIABLES = vars;
+		}
+		Properties()
+		{
+			
+		}
+};
