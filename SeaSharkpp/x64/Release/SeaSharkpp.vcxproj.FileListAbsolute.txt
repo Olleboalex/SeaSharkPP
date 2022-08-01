@@ -1,1 +1,2 @@
 D:\VisualStudioProjects\SeaSharkPLUSPLUS\SeaSharkPP\SeaSharkpp\x64\Release\SeaSharkpp.exe
+C:\Users\ealegus\source\repos\SeaSharkPP\SeaSharkpp\x64\Release\SeaSharkpp.exe

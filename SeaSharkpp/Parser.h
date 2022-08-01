@@ -389,11 +389,18 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 		}
 		else if (tokens[cursor].ID == "VAR")
 		{
-			if (!(*Variables).count(tokens[cursor].NAME))
+			if (cursor < tokens.size() - 1 && tokens[cursor + 1].ID == "DOT") 
 			{
-				(*Variables)[tokens[cursor].NAME] = Token(0);
+
 			}
-			if (tokens.size() == 1) return (*Variables)[tokens[cursor].NAME];
+			else 
+			{
+				if (!(*Variables).count(tokens[cursor].NAME))
+				{
+					(*Variables)[tokens[cursor].NAME] = Token(0);
+				}
+				if (tokens.size() == 1) return (*Variables)[tokens[cursor].NAME];
+			}
 		}
 		else if (tokens[cursor].ID == "SETEQUALS")
 		{
@@ -655,9 +662,16 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 		}
 		else if (tokens[cursor].ID == "METHOD")
 		{
-			Token tok = ParseMethodCall(tokens[cursor], methods, Variables);
-			if (tok.ID == "ERROR") return tok;
-			if (tokens.size() == 1) return tok;
+			if (cursor < tokens.size() - 1 && tokens[cursor + 1].ID == "DOT")
+			{
+
+			}
+			else
+			{
+				Token tok = ParseMethodCall(tokens[cursor], methods, Variables);
+				if (tok.ID == "ERROR") return tok;
+				if (tokens.size() == 1) return tok;
+			}
 		}
 		else if (tokens[cursor].ID == "LIST")
 		{

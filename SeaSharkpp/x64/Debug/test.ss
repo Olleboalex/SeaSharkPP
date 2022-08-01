@@ -1,21 +1,34 @@
 using System
 
-struct test
+struct vector
 {
-	value = 5
-	check = true
-	def hello()
+	Name = ""
+	x = 0
+	y = 0
+	z = 0
+
+	def GetName()
 	{
-		return "Hello World"
+		return "Position"
 	}
 }
 
-a = test()
-a = a.set("value", 100)
-a = a.set("check", false)
-
-if(!a.check)
+def PrintVector(vec)
 {
-	printline(a.hello())
-	printline(a.value)
-}
+	print(vec.Name)
+	print(": (")
+	print(vec.x)
+	print(", ")
+	print(vec.y)
+	print(", ")
+	print(vec.z)
+	printline(")")
+}	
+
+position = vector()
+
+position = position.set("x", 50)
+position = position.set("Name", "Position vector")
+
+PrintVector(position)
+printline(position.GetName())
