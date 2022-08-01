@@ -182,29 +182,32 @@ Token ParseMethodCall(Token MethodCall, unordered_map<string, method>* methods, 
 		tok.ID = MethodCall.NAME;
 		tok.structVars = props[MethodCall.NAME].VARIABLES;
 
-		Token listToken = Parse(MethodCall.EvalStatement[0], methods, Variables);
-
-		if (listToken.EvalStatement.size() % 2 == 1)
+		if (MethodCall.EvalStatement.size() == 1)
 		{
-			return ErrorToken("Invalid constructor arguments");
-		}
+			Token listToken = Parse(MethodCall.EvalStatement[0], methods, Variables);
 
-		for (int i = 0; i < listToken.EvalStatement.size(); i += 2)
-		{
-			if (listToken.EvalStatement[i][0].ID == "STRING")
+			if (listToken.EvalStatement.size() % 2 == 1)
 			{
-				if (tok.structVars.count(listToken.EvalStatement[i][0].stringVal))
+				return ErrorToken("Invalid constructor arguments");
+			}
+
+			for (int i = 0; i < listToken.EvalStatement.size(); i += 2)
+			{
+				if (listToken.EvalStatement[i][0].ID == "STRING")
 				{
-					tok.structVars[listToken.EvalStatement[i][0].stringVal] = listToken.EvalStatement[i + 1][0];
+					if (tok.structVars.count(listToken.EvalStatement[i][0].stringVal))
+					{
+						tok.structVars[listToken.EvalStatement[i][0].stringVal] = listToken.EvalStatement[i + 1][0];
+					}
+					else
+					{
+						return ErrorToken("Invalid constructor arguments");
+					}
 				}
 				else
 				{
 					return ErrorToken("Invalid constructor arguments");
 				}
-			}
-			else
-			{
-				return ErrorToken("Invalid constructor arguments");
 			}
 		}
 
@@ -688,7 +691,7 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 			{
 				Token errorToken;
 				errorToken.ID = "ERROR";
-				errorToken.NAME = "Cant increment when there is no variable";
+				errorToken.NAME = "Cant decrement when there is no variable";
 				return errorToken;
 			}
 		}
