@@ -1,34 +1,21 @@
 using System
+using OpenGL
+using FileWriter
 
 struct vector
 {
-	Name = ""
-	x = 0
-	y = 0
-	z = 0
-
-	def GetName()
-	{
-		return "Position"
-	}
+    x = 0
+    y = 0
+    z = 0
 }
 
-def PrintVector(vec)
+struct test
 {
-	print(vec.Name)
-	print(": (")
-	print(vec.x)
-	print(", ")
-	print(vec.y)
-	print(", ")
-	print(vec.z)
-	printline(")")
-}	
+    pos = vector()
+}
 
-position = vector()
+Player = test()
 
-position = position.set("x", 50)
-position = position.set("Name", "Position vector")
+Player = Player.set("pos", Player.pos.set("x", 100))
 
-PrintVector(position)
-printline(position.GetName())
+printline(Player.pos.x)

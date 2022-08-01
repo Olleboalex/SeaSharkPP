@@ -530,6 +530,11 @@ vector<Token> LexText(string Text)
 						if(Text[cursor] == ' ') break;
 						if(Text[cursor] == '\n') break;
 						if(Text[cursor] == '\t') break;
+						if (Text[cursor] == '.')
+						{
+							cursor--;
+							break;
+						}
 						if(mathOperators.count(Text[cursor]) && Text[cursor] != ')')
 						{
 							cursor++;

@@ -690,60 +690,113 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 		}
 		else if(tokens[cursor].ID == "DOT")
 		{
-			if(cursor > 0)
+			if(cursor < tokens.size() - 1 && tokens[cursor + 1].ID == "DOT")
 			{
-				Token objTok = tokens[cursor - 1];
-				string relevantID = "";
-				if(objTok.ID == "VAR")
+			}
+			else
+			{
+				if (cursor > 0)
 				{
-					if((*Variables).count(objTok.NAME))
+					Token objTok = tokens[cursor - 1];
+					string relevantID = "";
+					if (objTok.ID == "VAR")
 					{
-						objTok = (*Variables)[objTok.NAME];
-					}
-					else
-					{
-						return ErrorToken("That variable does not exist");
-					}
-				}
-				else if(objTok.ID == "METHOD")
-				{
-					objTok = ParseMethodCall(objTok, methods, Variables);
-					if(objTok.ID == "ERROR") return objTok;
-				}
-
-				if(props.count(objTok.ID))
-				{
-					if(tokens[cursor].ExecStatement.size() == 1)
-					{
-						Token propTok = tokens[cursor].ExecStatement[0];
-						if(propTok.ID == "VAR")
+						if ((*Variables).count(objTok.NAME))
 						{
-							if(objTok.structVars.count(propTok.NAME))
-							{
-								Token tok = objTok.structVars[propTok.NAME];
-								if (tok.ID == "ERROR") return tok;
-								if (tokens.size() == 2) return tok;
-							}
-							else
-							{
-								return ErrorToken("That property does not exist");
-							}
+							objTok = (*Variables)[objTok.NAME];
 						}
-						else if(propTok.ID == "METHOD")
+						else
 						{
-							if(props[objTok.ID].METHODS.count(propTok.NAME))
+							return ErrorToken("That variable does not exist");
+						}
+					}
+					else if (objTok.ID == "METHOD")
+					{
+						objTok = ParseMethodCall(objTok, methods, Variables);
+						if (objTok.ID == "ERROR") return objTok;
+					}
+					else if (objTok.ID == "DOT")
+					{
+						objTok = Parse(vector<Token>{tokens[cursor - 2], tokens[cursor - 1]}, methods, Variables);
+						if (objTok.ID == "ERROR") return objTok;
+					}
+
+					if (props.count(objTok.ID))
+					{
+						if (tokens[cursor].ExecStatement.size() == 1)
+						{
+							Token propTok = tokens[cursor].ExecStatement[0];
+							if (propTok.ID == "VAR")
 							{
-								if (props[objTok.ID].METHODS[propTok.NAME].SystemMethod)
+								if (objTok.structVars.count(propTok.NAME))
 								{
-									propTok.EvalStatement.insert(propTok.EvalStatement.begin(), vector<Token>{objTok});
+									Token tok = objTok.structVars[propTok.NAME];
+									if (tok.ID == "ERROR") return tok;
+									if (tokens.size() == 2) return tok;
+									int propertyholders = 0;
+									bool check = true;
+									for (int i = 0; i < tokens.size(); i++)
+									{
+										if (tokens[i].ID == "VAR" || tokens[i].ID == "METHOD")
+										{
+											propertyholders++;
+											if (propertyholders > 1)
+											{
+												check = false;
+												break;
+											}
+										}
+										else if (tokens[i].ID != "DOT")
+										{
+											check = false;
+										}
+									}
+									if (check) return tok;
 								}
-								Token tok = ParseMethodCall(propTok, &props[objTok.ID].METHODS, Variables);
-								if (tok.ID == "ERROR") return tok;
-								if (tokens.size() == 2) return tok;
+								else
+								{
+									return ErrorToken("That property does not exist");
+								}
+							}
+							else if (propTok.ID == "METHOD")
+							{
+								if (props[objTok.ID].METHODS.count(propTok.NAME))
+								{
+									if (props[objTok.ID].METHODS[propTok.NAME].SystemMethod)
+									{
+										propTok.EvalStatement.insert(propTok.EvalStatement.begin(), vector<Token>{objTok});
+									}
+									Token tok = ParseMethodCall(propTok, &props[objTok.ID].METHODS, Variables);
+									if (tok.ID == "ERROR") return tok;
+									if (tokens.size() == 2) return tok;
+									int propertyholders = 0;
+									bool check = true;
+									for (int i = 0; i < tokens.size(); i++)
+									{
+										if (tokens[i].ID == "VAR" || tokens[i].ID == "METHOD")
+										{
+											propertyholders++;
+											if (propertyholders > 1)
+											{
+												check = false;
+												break;
+											}
+										}
+										else if (tokens[i].ID != "DOT")
+										{
+											check = false;
+										}
+									}
+									if (check) return tok;
+								}
+								else
+								{
+									return ErrorToken("That property does not exist");
+								}
 							}
 							else
 							{
-								return ErrorToken("That property does not exist");
+								return ErrorToken("That is an incorrect property call");
 							}
 						}
 						else
@@ -753,17 +806,13 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 					}
 					else
 					{
-						return ErrorToken("That is an incorrect property call");
+						return ErrorToken("That structure has no properties");
 					}
 				}
 				else
 				{
-					return ErrorToken("That structure has no properties");
+					return ErrorToken("Property call must be applied to an object");
 				}
-			}
-			else
-			{
-				return ErrorToken("Property call must be applied to an object");
 			}
 		}
 		else if(tokens[cursor].ID == "STRUCT")

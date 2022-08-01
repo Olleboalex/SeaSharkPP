@@ -64,7 +64,7 @@ int main(int argc, char** argv)
 	}
 
 	vector<Token> tokens = LexText(code);
-	
+
 	Token runToken = Parse(tokens, &METHODS, &VARIABLES);
 
 	if (runToken.ID == "ERROR")

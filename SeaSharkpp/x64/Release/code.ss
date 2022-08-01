@@ -1,19 +1,21 @@
 using System
-using math
 using OpenGL
+using FileWriter
 
-gl_Init()
-
-start = gl_getTime()
-
-i = 0
-while(i <= 180)
+struct vector
 {
-	printline(sin(ToRad(i)))
-	i++
+    x = 0
+    y = 0
+    z = 0
 }
-stop = gl_getTime()
 
-printline(stop - start)
+struct test
+{
+    pos = vector()
+}
 
-read()
+Player = test()
+
+position = Player.pos
+
+printline(Player.pos.x)
