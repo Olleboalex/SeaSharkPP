@@ -219,8 +219,16 @@ Token ParseArithmetic(vector<Token> tokens, unordered_map<string, method>* metho
 		{
 			if(cursor < tokens.size() - 1 && tokens[cursor + 1].ID == "DOT")
 			{
+				vector<Token> dotTokens{
+					tokens[cursor], tokens[cursor + 1]
+				};
 				cursor++;
-				Token tok = Parse(vector<Token> {tokens[cursor - 1], tokens[cursor]}, methods, Variables);
+				while(cursor < tokens.size() - 1 && tokens[cursor + 1].ID == "DOT")
+				{
+					dotTokens.push_back(tokens[cursor + 1]);
+					cursor++;
+				}
+				Token tok = Parse(dotTokens, methods, Variables);
 				if (tok.ID != "INT" && tok.ID != "FLOAT")
 				{
 					Token errorTok;
@@ -248,8 +256,16 @@ Token ParseArithmetic(vector<Token> tokens, unordered_map<string, method>* metho
 		{
 			if (cursor < tokens.size() - 1 && tokens[cursor + 1].ID == "DOT")
 			{
+				vector<Token> dotTokens{
+					tokens[cursor], tokens[cursor + 1]
+				};
 				cursor++;
-				Token tok = Parse(vector<Token> {tokens[cursor - 1], tokens[cursor]}, methods, Variables);
+				while (cursor < tokens.size() - 1 && tokens[cursor + 1].ID == "DOT")
+				{
+					dotTokens.push_back(tokens[cursor + 1]);
+					cursor++;
+				}
+				Token tok = Parse(dotTokens, methods, Variables);
 				if (tok.ID != "INT" && tok.ID != "FLOAT")
 				{
 					Token errorTok;

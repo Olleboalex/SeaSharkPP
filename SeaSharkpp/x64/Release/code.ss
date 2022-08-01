@@ -9,13 +9,8 @@ struct vector
     z = 0
 }
 
-struct test
-{
-    pos = vector()
-}
+position = vector(["x", 5, "y", 10, "z", 20])
 
-Player = test()
-
-position = Player.pos
-
-printline(Player.pos.x)
+printline(position.x)
+printline(position.y)
+printline(position.z)
