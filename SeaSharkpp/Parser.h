@@ -191,6 +191,8 @@ Token ParseMethodCall(Token MethodCall, unordered_map<string, method>* methods, 
 				return ErrorToken("Invalid constructor arguments");
 			}
 
+			if (listToken.ID == "ERROR") return listToken;
+
 			for (int i = 0; i < listToken.EvalStatement.size(); i += 2)
 			{
 				if (listToken.EvalStatement[i][0].ID == "STRING")
