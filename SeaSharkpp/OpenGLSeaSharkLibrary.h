@@ -212,7 +212,7 @@ Token checkInput(string key)
 unordered_map<string, Shader> Shaders;
 
 /*Method initializes opengl*/
-Token gl_INIT(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token gl_INIT(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -225,7 +225,7 @@ Token gl_INIT(Token MethodCall, unordered_map<string, method>* methods, unordere
 }
 
 /*Method creates a new shader and adds it to Shaders map with name according to given input*/
-Token gl_createShader(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token gl_createShader(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	Token nameToken = MethodCall.EvalStatement[0][0];
 	if (nameToken.ID == "STRING")
@@ -243,7 +243,7 @@ Token gl_createShader(Token MethodCall, unordered_map<string, method>* methods, 
 }
 
 /*Compiles the given vertex shader and fragment shader and creates a program in the given shader*/
-Token gl_compileShader(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token gl_compileShader(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	Token nameToken = MethodCall.EvalStatement[0][0];
 	if (nameToken.ID == "STRING")
@@ -295,7 +295,7 @@ Token gl_compileShader(Token MethodCall, unordered_map<string, method>* methods,
 }
 
 /*Method intializes the given shader with the dimensions given*/
-Token gl_InitShader(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token gl_InitShader(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	Token nameToken = MethodCall.EvalStatement[0][0];
 	if (nameToken.ID == "STRING")
@@ -346,7 +346,7 @@ Token gl_InitShader(Token MethodCall, unordered_map<string, method>* methods, un
 }
 
 /*Method sets the vertices and indices in the given shader in that order*/
-Token SetVertsInShader(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token SetVertsInShader(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	Token nameToken = MethodCall.EvalStatement[0][0];
 	if (nameToken.ID == "STRING")
@@ -437,7 +437,7 @@ Token SetVertsInShader(Token MethodCall, unordered_map<string, method>* methods,
 }
 
 /*Method renders new frame in given shaders window*/
-Token gl_updateShader(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token gl_updateShader(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	Token nameToken = MethodCall.EvalStatement[0][0];
 	if (nameToken.ID == "STRING")
@@ -467,7 +467,7 @@ Token gl_updateShader(Token MethodCall, unordered_map<string, method>* methods, 
 }
 
 /*Method terminates glfw*/
-Token gl_Terminate(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token gl_Terminate(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	glfwTerminate();
 	Token tok;
@@ -476,7 +476,7 @@ Token gl_Terminate(Token MethodCall, unordered_map<string, method>* methods, uno
 }
 
 /*Returns true if the given shaders window should close otherwise false*/
-Token gl_shouldClose(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token gl_shouldClose(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	Token nameToken = MethodCall.EvalStatement[0][0];
 	if (nameToken.ID == "STRING")
@@ -506,7 +506,7 @@ Token gl_shouldClose(Token MethodCall, unordered_map<string, method>* methods, u
 }
 
 /*Returns the dimensions of the given shaders window in a list with two elements*/
-Token gl_windowSize(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token gl_windowSize(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	Token nameTok = MethodCall.EvalStatement[0][0];
 	if (nameTok.ID == "STRING")
@@ -535,7 +535,7 @@ Token gl_windowSize(Token MethodCall, unordered_map<string, method>* methods, un
 }
 
 /*Returns float token with the time that the program has run in seconds*/
-Token gl_getTime(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token gl_getTime(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	Token result;
 	result.ID = "FLOAT";
@@ -544,7 +544,7 @@ Token gl_getTime(Token MethodCall, unordered_map<string, method>* methods, unord
 }
 
 /*Sets up given shader window to close*/
-Token gl_Close(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token gl_Close(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	Token nameToken = MethodCall.EvalStatement[0][0];
 	if (nameToken.ID == "STRING")
@@ -566,7 +566,7 @@ Token gl_Close(Token MethodCall, unordered_map<string, method>* methods, unorder
 }
 
 /*Returns true token if given key is pressed otherwise returns false token*/
-Token gl_isPressed(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token gl_isPressed(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	Token keyToken = MethodCall.EvalStatement[0][0];
 	if (keyToken.ID == "STRING")
@@ -580,7 +580,7 @@ Token gl_isPressed(Token MethodCall, unordered_map<string, method>* methods, uno
 }
 
 /*Returns current mouse position in screen coordinates as a list with two elements*/
-Token gl_mousePosition(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token gl_mousePosition(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	Token result;
 	result.ID = "LIST";
@@ -603,7 +603,7 @@ Token gl_mousePosition(Token MethodCall, unordered_map<string, method>* methods,
 }
 
 /*Method sets the position of the mouse coordinates to the given ints*/
-Token gl_setmousePosition(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token gl_setmousePosition(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	Token xTok = MethodCall.EvalStatement[0][0];
 	Token yTok = MethodCall.EvalStatement[1][0];
@@ -620,7 +620,7 @@ Token gl_setmousePosition(Token MethodCall, unordered_map<string, method>* metho
 }
 
 /*Method sets the visibility of the cursor, input is bool*/
-Token gl_setmouseVisibility(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token gl_setmouseVisibility(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	Token input = MethodCall.EvalStatement[0][0];
 	if (input.ID == "BOOL")
@@ -642,7 +642,7 @@ Token gl_setmouseVisibility(Token MethodCall, unordered_map<string, method>* met
 }
 
 /*Method sets uniform values in the given shader*/
-Token gl_uniform1f(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token gl_uniform1f(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	Token nameTok = MethodCall.EvalStatement[0][0];
 	if (nameTok.ID == "STRING")
@@ -678,7 +678,7 @@ Token gl_uniform1f(Token MethodCall, unordered_map<string, method>* methods, uno
 		return ErrorToken("First parameter in gl_uniform1f() call must be of type string");
 	}
 }
-Token gl_uniform2f(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token gl_uniform2f(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	Token nameTok = MethodCall.EvalStatement[0][0];
 	if (nameTok.ID == "STRING")
@@ -722,7 +722,7 @@ Token gl_uniform2f(Token MethodCall, unordered_map<string, method>* methods, uno
 		return ErrorToken("First parameter in gl_uniform2f() call must be of type string");
 	}
 }
-Token gl_uniform3f(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token gl_uniform3f(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	Token nameTok = MethodCall.EvalStatement[0][0];
 	if (nameTok.ID == "STRING")
@@ -776,7 +776,7 @@ Token gl_uniform3f(Token MethodCall, unordered_map<string, method>* methods, uno
 }
 
 /*Method sets the given uniform id in the given shader to the list of floats given*/
-Token gl_uniformarrayf(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token gl_uniformarrayf(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	Token nameTok = MethodCall.EvalStatement[0][0];
 	if (nameTok.ID == "STRING")

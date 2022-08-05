@@ -4,9 +4,11 @@
 #include <vector>
 #include <iostream>
 #include <unordered_map>
+#include <map>
 #include <fstream>
 #include <string>
 #include <time.h>
+#include <memory>
 
 using namespace std;
 
@@ -77,6 +79,7 @@ bool IsDigit(char c)
 	return c >= '0' && c <= '9';
 }
 
+
 struct Token
 {
 	public:
@@ -89,7 +92,7 @@ struct Token
 		string NAME;
 		vector<vector<Token>> EvalStatement;
 		vector<Token> ExecStatement;
-		unordered_map<string, Token> structVars;
+		map<string, Token> structVars;
 
 		// Input is single char operator
 		// Constructor assigns values
@@ -236,7 +239,7 @@ struct method
 		string Name;
 		vector<vector<Token>> Parameters;
 		vector<Token> ExecutionStatements;
-		Token(*func)(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables);
+		Token(*func)(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables);
 		bool SystemMethod;
 		bool fromLib;
 		method(string name, vector<vector<Token>> params, vector<Token> exec)
@@ -247,7 +250,7 @@ struct method
 			SystemMethod = false;
 			fromLib = false;
 		}
-		method(string name, vector<vector<Token>> params, vector<Token> exec, Token(*function)(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables), bool systemMethod)
+		method(string name, vector<vector<Token>> params, vector<Token> exec, Token(*function)(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables), bool systemMethod)
 		{
 			Name = name;
 			Parameters = params;
@@ -256,7 +259,7 @@ struct method
 			fromLib = false;
 			func = function;
 		}
-		method(string name, vector<vector<Token>> params, vector<Token> exec, Token(*function)(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables), bool systemMethod, bool library)
+		method(string name, vector<vector<Token>> params, vector<Token> exec, Token(*function)(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables), bool systemMethod, bool library)
 		{
 			Name = name;
 			Parameters = params;
@@ -287,9 +290,9 @@ struct Properties
 {
 	public:
 		unordered_map<string, method> METHODS;
-		unordered_map<string, Token> VARIABLES;
+		map<string, Token> VARIABLES;
 
-		Properties(unordered_map<string, method> methods, unordered_map<string, Token> vars)
+		Properties(unordered_map<string, method> methods, map<string, Token> vars)
 		{
 			METHODS = methods;
 			VARIABLES = vars;

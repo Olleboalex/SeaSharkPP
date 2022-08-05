@@ -7,11 +7,11 @@
 
 using namespace std;
 
-Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables);
+Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, map<string, Token>* Variables);
 
-Token SystemMethod(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables);
+Token SystemMethod(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables);
 
-Token ParseMethodCall(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables);
+Token ParseMethodCall(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables);
 
 Token ParseArithmeticPLUSMINUS(vector<Token> tokens)
 {
@@ -209,7 +209,7 @@ Token ParseArithmeticPARAN(vector<Token> tokens)
 	return ParseArithmeticModulus(resultTokens);
 }
 
-Token ParseArithmetic(vector<Token> tokens, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token ParseArithmetic(vector<Token> tokens, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	vector<Token> resultTokens;
 	int cursor = 0;
@@ -291,7 +291,7 @@ Token ParseArithmetic(vector<Token> tokens, unordered_map<string, method>* metho
 	return ParseArithmeticPARAN(resultTokens);
 }
 
-Token ParseBool(vector<Token> tokens, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token ParseBool(vector<Token> tokens, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	if (tokens.size() == 1)
 	{

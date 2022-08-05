@@ -8,7 +8,7 @@
 #include <time.h>
 
 
-Token readFile(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token readFile(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	if (MethodCall.EvalStatement[0].size() == 1)
 	{
@@ -140,7 +140,7 @@ Token readFile(Token MethodCall, unordered_map<string, method>* methods, unorder
 	}
 }
 
-Token writeFile(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token writeFile(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	if (MethodCall.EvalStatement[0][0].ID == "STRING")
 	{

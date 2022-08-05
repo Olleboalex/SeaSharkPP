@@ -9,6 +9,7 @@
 #include "StandardLibrary.h"
 #include "FileWriter.h"
 #include "OpenGLSeaSharkLibrary.h"
+#include <memory>
 //#include "irrKlangSeaShark.h"
 
 #define TOK vector<Token>
@@ -33,11 +34,11 @@ unordered_map<string, method> listMethods{
 
 unordered_map<string, method> METHODS;
 
-unordered_map<string, Token> VARIABLES;
+map<string, Token> VARIABLES;
 
 unordered_map<string, Properties> props{
-	make_pair("LIST", Properties(listMethods, unordered_map<string, Token>())),
-	make_pair("STRING", Properties(listMethods, unordered_map<string, Token>()))
+	make_pair("LIST", Properties(listMethods, map<string, Token>())),
+	make_pair("STRING", Properties(listMethods, map<string, Token>()))
 };
 
 unordered_map<string, unordered_map<string, method>> ContainedLibraries{
@@ -47,7 +48,7 @@ unordered_map<string, unordered_map<string, method>> ContainedLibraries{
 	//make_pair("IrrKlang", irrKlangMethods)
 };
 
-Token UniversalStructSet(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token UniversalStructSet(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	Token structToken = MethodCall.EvalStatement[0][0];
 	Token IdToken = MethodCall.EvalStatement[1][0];
@@ -75,7 +76,7 @@ Token UniversalStructSet(Token MethodCall, unordered_map<string, method>* method
 Function parses elements in methodcall parameters and if none are of type error it calls the appropriate function.
 If function call contains incorrect number of parameters returns error here.
 */
-Token SystemMethod(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token SystemMethod(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	if ((*methods).count(MethodCall.NAME))
 	{
@@ -168,7 +169,7 @@ bool CheckIfNameIsContained(vector<vector<Token>> x, string name)
 	return false;
 }
 
-Token ParseMethodCall(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token ParseMethodCall(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 
 	if(props.count(MethodCall.NAME))
@@ -238,7 +239,7 @@ Token ParseMethodCall(Token MethodCall, unordered_map<string, method>* methods, 
 	}
 	else if ((*methods)[MethodCall.NAME].fromLib)
 	{
-	unordered_map<string, Token> funcVariables = VARIABLES;
+	map<string, Token> funcVariables = VARIABLES;
 	for (int i = 0; i < (*methods)[MethodCall.NAME].Parameters.size(); i++)
 	{
 		vector<Token> token = { MethodCall.EvalStatement[i] };
@@ -249,7 +250,7 @@ Token ParseMethodCall(Token MethodCall, unordered_map<string, method>* methods, 
 	}
 	else
 	{
-	unordered_map<string, Token> funcVariables = VARIABLES;
+	map<string, Token> funcVariables = VARIABLES;
 	for (int i = 0; i < (*methods)[MethodCall.NAME].Parameters.size(); i++)
 	{
 		vector<Token> token = { MethodCall.EvalStatement[i] };
@@ -270,7 +271,7 @@ Token ParseMethodCall(Token MethodCall, unordered_map<string, method>* methods, 
 	}
 }
 
-Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	int cursor = 0;
 	while (cursor < tokens.size())
@@ -370,20 +371,6 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 				Token res = Parse(result, methods, Variables);
 				if (res.ID != "NORETURN") return res;
 			}
-		}
-		else if (tokens[cursor].ID == "ELSE")
-		{
-			Token errorToken;
-			errorToken.ID = "ERROR";
-			errorToken.NAME = "Could not find if statement";
-			return errorToken;
-		}
-		else if (tokens[cursor].ID == "ELIF")
-		{
-			Token errorToken;
-			errorToken.ID = "ERROR";
-			errorToken.NAME = "Could not find if statement";
-			return errorToken;
 		}
 		else if (tokens[cursor].ID == "WHILE")
 		{
@@ -853,7 +840,7 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, unorde
 			unordered_map<string, method> meths{
 				make_pair("set", method("set", vector<vector<Token>> {vector<Token>(), vector<Token>(), vector<Token>()}, vector<Token>(),& UniversalStructSet, true))
 			};
-			unordered_map<string, Token> vars;
+			map<string, Token> vars;
 			Token tok = Parse(tokens[cursor].ExecStatement, &meths, &vars);
 			if (tok.ID == "ERROR") return tok;
 			props[tokens[cursor].NAME] = Properties(meths, vars);

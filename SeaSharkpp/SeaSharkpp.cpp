@@ -14,7 +14,7 @@ using namespace std;
 
 string codePath = "test.ss";
 
-string version = "2.0";
+string version = "2.1";
 
 
 int main(int argc, char** argv)

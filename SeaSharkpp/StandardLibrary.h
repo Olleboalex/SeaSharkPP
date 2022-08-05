@@ -49,7 +49,7 @@ bool compareTokens(Token a, Token b)
 	return false;
 }
 
-Token print(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token print(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	if (MethodCall.EvalStatement.size() == 1)
 	{
@@ -78,7 +78,7 @@ Token print(Token MethodCall, unordered_map<string, method>* methods, unordered_
 	tokk.ID = "NORETURN";
 	return tokk;
 }
-Token printline(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token printline(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	if (MethodCall.EvalStatement.size() == 1)
 	{
@@ -106,14 +106,14 @@ Token printline(Token MethodCall, unordered_map<string, method>* methods, unorde
 	tokk.ID = "NORETURN";
 	return tokk;
 }
-Token read(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token read(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	Token tok;
 	tok.ID = "STRING";
 	cin >> tok.stringVal;
 	return tok;
 }
-Token Int(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token Int(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	if (MethodCall.EvalStatement.size() != 1 || MethodCall.EvalStatement[0].size() != 1)
 	{
@@ -153,7 +153,7 @@ Token Int(Token MethodCall, unordered_map<string, method>* methods, unordered_ma
 		return errorTok;
 	}
 }
-Token Float(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token Float(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	if (MethodCall.EvalStatement.size() != 1 || MethodCall.EvalStatement[0].size() != 1)
 	{
@@ -193,7 +193,7 @@ Token Float(Token MethodCall, unordered_map<string, method>* methods, unordered_
 		return errorTok;
 	}
 }
-Token String(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token String(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	Token tok = MethodCall.EvalStatement[0][0];
 	Token result;
@@ -221,7 +221,7 @@ Token String(Token MethodCall, unordered_map<string, method>* methods, unordered
 
 	return result;
 }
-Token random(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token random(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	if (MethodCall.EvalStatement.size() == 2)
 	{
@@ -264,7 +264,7 @@ Token random(Token MethodCall, unordered_map<string, method>* methods, unordered
 		return errorToken;
 	}
 }
-Token append(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token append(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	Token listToken = MethodCall.EvalStatement[0][0];
 	if (listToken.ID == "LIST")
@@ -296,7 +296,7 @@ Token append(Token MethodCall, unordered_map<string, method>* methods, unordered
 		return errorToken;
 	}
 }
-Token appendmultiple(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token appendmultiple(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	Token listToken = MethodCall.EvalStatement[0][0];
 	if (listToken.ID == "LIST")
@@ -323,7 +323,7 @@ Token appendmultiple(Token MethodCall, unordered_map<string, method>* methods, u
 		return errorToken;
 	}
 }
-Token get(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token get(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	Token listToken = MethodCall.EvalStatement[0][0];
 
@@ -389,7 +389,7 @@ Token get(Token MethodCall, unordered_map<string, method>* methods, unordered_ma
 	}
 
 }
-Token remove(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token remove(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	Token listToken = MethodCall.EvalStatement[0][0];
 	if (listToken.ID == "LIST")
@@ -452,7 +452,7 @@ Token remove(Token MethodCall, unordered_map<string, method>* methods, unordered
 		return errorToken;
 	}
 }
-Token set(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token set(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	Token listToken = MethodCall.EvalStatement[0][0];
 	if (listToken.ID == "LIST")
@@ -489,7 +489,7 @@ Token set(Token MethodCall, unordered_map<string, method>* methods, unordered_ma
 		return errorToken;
 	}
 }
-Token size(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token size(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	Token listToken = MethodCall.EvalStatement[0][0];
 	if (listToken.ID == "LIST")
@@ -514,7 +514,7 @@ Token size(Token MethodCall, unordered_map<string, method>* methods, unordered_m
 		return errorToken;
 	}
 }
-Token contains(Token MethodCall, unordered_map<string, method>* methods, unordered_map<string, Token>* Variables)
+Token contains(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	Token listToken = MethodCall.EvalStatement[0][0];
 	if (listToken.ID == "LIST")
