@@ -7,6 +7,8 @@
 #include <string>
 #include <time.h>
 
+unsigned int randomSeed = time(NULL);
+
 bool compareTokens(Token a, Token b)
 {
 	if (a.ID == b.ID)
@@ -232,8 +234,10 @@ Token random(Token MethodCall, unordered_map<string, method>* methods, map<strin
 		{
 			if (LowerLimit.intVal < UpperLimit.intVal)
 			{
-				srand(time(NULL));
-				int result = rand() % (UpperLimit.intVal + 1 - LowerLimit.intVal) + LowerLimit.intVal;
+				srand(randomSeed);
+				int randomnum = rand();
+				int result = randomnum % (UpperLimit.intVal + 1 - LowerLimit.intVal) + LowerLimit.intVal;
+				randomSeed += randomnum;
 				Token tok;
 				tok.ID = "INT";
 				tok.intVal = result;

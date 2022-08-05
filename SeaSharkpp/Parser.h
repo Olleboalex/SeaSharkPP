@@ -148,6 +148,16 @@ Token ParseLib(vector<Token> tokens, unordered_map<string, method>* methods)
 				if (libToken.ID == "ERROR") return libToken;
 			}
 		}
+		else if(tokens[cursor].ID == "STRUCT")
+		{
+			unordered_map<string, method> meths{
+				make_pair("set", method("set", vector<vector<Token>> {vector<Token>(), vector<Token>(), vector<Token>()}, vector<Token>(),& UniversalStructSet, true))
+			};
+			map<string, Token> vars;
+			Token tok = Parse(tokens[cursor].ExecStatement, &meths, &vars);
+			if (tok.ID == "ERROR") return tok;
+			props[tokens[cursor].NAME] = Properties(meths, vars);
+		}
 		else
 		{
 			Token errorToken;
