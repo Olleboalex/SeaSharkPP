@@ -15,7 +15,7 @@ using namespace std;
 
 string codePath = "test.ss";
 
-string version = "2.1";
+string version = "2.2";
 
 
 int main(int argc, char** argv)
@@ -63,7 +63,6 @@ int main(int argc, char** argv)
 		cout << "Failed to find file at: " << codePath << endl;
 		return 0;
 	}
-
 	vector<Token> tokens = LexText(code);
 
 	Token runToken = Parse(tokens, &METHODS, &VARIABLES);

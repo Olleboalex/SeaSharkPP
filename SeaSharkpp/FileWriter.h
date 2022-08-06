@@ -163,6 +163,7 @@ Token writeFile(Token MethodCall, unordered_map<string, method>* methods, map<st
 			errorToken.NAME = "writeFile() method call requires string, int or float as first parameter";
 			return errorToken;
 		}
+		return noReturnToken();
 	}
 	else
 	{

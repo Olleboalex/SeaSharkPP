@@ -641,6 +641,28 @@ Token gl_setmouseVisibility(Token MethodCall, unordered_map<string, method>* met
 	return noReturnToken();
 }
 
+//Method enables or disables vsync according to bool input
+Token gl_setVsync(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
+{
+	Token input = MethodCall.EvalStatement[0][0];
+	if (input.ID == "BOOL")
+	{
+		if (input.boolVal)
+		{
+			glfwSwapInterval(1);
+		}
+		else
+		{
+			glfwSwapInterval(0);
+		}
+	}
+	else
+	{
+		return ErrorToken("First parameter in gl_setVsync() call must be of type bool");
+	}
+	return noReturnToken();
+}
+
 /*Method sets uniform values in the given shader*/
 Token gl_uniform1f(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
@@ -842,6 +864,7 @@ unordered_map<string, method> OpenGLSSMethods
 	make_pair("gl_mousePosition", method("gl_mousePosition", vector<vector<Token>> (), vector<Token>(), &gl_mousePosition, true)),
 	make_pair("gl_setmousePosition", method("gl_setmousePosition", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), &gl_setmousePosition, true)),
 	make_pair("gl_setmouseVisibility", method("gl_setmouseVisibility", vector<vector<Token>> {vector<Token>()}, vector<Token>(), &gl_setmouseVisibility, true)),
+	make_pair("gl_setVsync", method("gl_setvSync", vector<vector<Token>> {vector<Token>()}, vector<Token>(), &gl_setVsync, true)),
 	make_pair("gl_uniform1f", method("gl_uniform1f", vector<vector<Token>> {vector<Token>(), vector<Token>(), vector<Token>()}, vector<Token>(), &gl_uniform1f, true)),
 	make_pair("gl_uniform2f", method("gl_uniform2f", vector<vector<Token>> {vector<Token>(), vector<Token>(), vector<Token>(), vector<Token>()}, vector<Token>(), &gl_uniform2f, true)),
 	make_pair("gl_uniform3f", method("gl_uniform3f", vector<vector<Token>> {vector<Token>(), vector<Token>(), vector<Token>(), vector<Token>(), vector<Token>()}, vector<Token>(), &gl_uniform3f, true)),

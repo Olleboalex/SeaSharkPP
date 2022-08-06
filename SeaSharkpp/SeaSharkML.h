@@ -35,6 +35,15 @@ struct Neuron
     {
 
     }
+    Neuron(vector<float> WEIGHTS)
+    {
+        weights = WEIGHTS;
+    }
+    Neuron(vector<float> WEIGHTS, float BIAS)
+    {
+        weights = WEIGHTS;
+        bias = BIAS;
+    }
     Neuron(int prevLayerCount)
     {
         vector<float> WEIGHTS;
@@ -94,6 +103,89 @@ struct NeuralNetwork
         neurons = neurs;
     }
 
+    NeuralNetwork(string path)
+    {
+        fstream lib;
+		lib.open(path, ios::in);
+		string text = "";
+		if (lib.is_open())
+		{
+			string line;
+			while (getline(lib, line))
+			{
+				text += line + '\n';
+			}
+			lib.close();
+		}
+        else
+        {
+            return;
+        }
+        vector<int> layout;
+        string temp = "";
+        int cursor = 0;
+        while(cursor < text.size())
+        {
+            if(text[cursor] == ':') break;
+            if(text[cursor] == ',')
+            {
+                layout.push_back(ParseInt(temp));
+                temp = "";
+            }
+            else
+            {
+                temp += text[cursor];
+            }
+            cursor++;
+        }
+        cursor++;
+        vector<vector<Neuron>> Neurons = {
+            vector<Neuron> ()
+        };
+        for(int i = 0; i < layout[0]; i++)
+        {
+            Neurons[0].push_back(Neuron());
+        }
+        for(int i = 1; i < layout.size(); i++)
+        {
+            Neurons.push_back(vector<Neuron>());
+            for(int j = 0; j < layout[i]; j++)
+            {
+                vector<float> weights;
+                for(int k = 0; k < layout[i - 1]; k++)
+                {
+                    while(cursor < text.size())
+                    {
+                        if(text[cursor] == ',')
+                        {
+                            weights.push_back(ParseFloat(temp));
+                            temp = "";
+                            cursor++;
+                            break;
+                        }
+                        temp += text[cursor];
+                        cursor++;
+                    }
+                }
+                float bias = 0;
+                while(cursor < text.size())
+                {
+                    if(text[cursor] == ',')
+                    {
+                        bias = ParseFloat(temp);
+                        temp = "";
+                        cursor++;
+                        break;
+                    }
+                    temp += text[cursor];
+                    cursor++;
+                }
+                Neurons[i].push_back(Neuron(weights, bias));
+            }
+        }
+        neurons = Neurons;
+    }
+
     vector<float> Think(vector<Neuron> inputLayer)
     {
         neurons[0] = inputLayer;
@@ -121,6 +213,33 @@ struct NeuralNetwork
                 neurons[i][j].MutateNeuron(mutationrate);
             }
         }
+    }
+    void SaveNetwork(string path)
+    {
+        string result = "";
+        for(int i = 0; i < neurons.size(); i++)
+        {
+            result += to_string(neurons[i].size());
+            result += ',';
+        }
+        result += ':';
+        for(int i = 1; i < neurons.size(); i++)
+        {
+            for(int j = 0; j < neurons[i].size(); j++)
+            {
+                for(int k = 0; k < neurons[i][j].weights.size(); k++)
+                {
+                    result += to_string(neurons[i][j].weights[k]);
+                    result += ',';
+                }
+                result += to_string(neurons[i][j].bias);
+                result += ',';
+            }
+        }
+        cout << result << endl;
+        ofstream file(path);
+		file << result;
+		file.close();
     }
 };
 
@@ -281,10 +400,60 @@ Token ml_Think(Token MethodCall, unordered_map<string, method>* methods, map<str
     }
 }
 
+// Saves neuralnetwork at given address to path specified
+Token ml_Save(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
+{
+    Token addressToken = MethodCall.EvalStatement[0][0];
+    Token pathToken = MethodCall.EvalStatement[1][0];
+    if(addressToken.ID == "INT")
+    {
+        if(addressToken.intVal < neuralNetworks.size() && addressToken.intVal >= 0)
+        {
+            if(pathToken.ID == "STRING")
+            {
+                neuralNetworks[addressToken.intVal].SaveNetwork(pathToken.stringVal);
+                return noReturnToken();
+            }
+            else
+            {
+                return ErrorToken("Second parameter in ml_Save() call must be of type string");
+            }
+        }
+        else
+        {
+            return ErrorToken("Address must fit into collection");
+        }
+    }
+    else
+    {
+        return ErrorToken("First parameter in ml_Save() call must be of type int");
+    }
+}
+
+// Loads neuralnetwork from given path and returns address
+Token ml_Load(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
+{
+    Token pathToken = MethodCall.EvalStatement[0][0];
+    if(pathToken.ID == "STRING")
+    {
+        neuralNetworks.push_back(NeuralNetwork(pathToken.stringVal));
+        Token tok;
+        tok.ID = "INT";
+        tok.intVal = neuralNetworks.size() - 1;
+        return tok;
+    }
+    else
+    {
+        return ErrorToken("First parameter in ml_Load() call must be of type string");
+    }
+}
+
 unordered_map<string, method> SSMLMethods
 {
 	make_pair("ml_createNetwork", method("ml_createNetwork", vector<vector<Token>>{vector<Token>()}, vector<Token>(), &ml_CreateNetwork, true)),
     make_pair("ml_cloneNetwork", method("ml_cloneNetwork", vector<vector<Token>>{vector<Token>()}, vector<Token>(), &ml_Clone, true)),
     make_pair("ml_mutateNetwork", method("ml_mutateNetwork", vector<vector<Token>>{vector<Token>(), vector<Token>()}, vector<Token>(), &ml_mutateNetwork, true)),
     make_pair("ml_Think", method("ml_Think", vector<vector<Token>>{vector<Token>(), vector<Token>()}, vector<Token>(), &ml_Think, true)),
+    make_pair("ml_Save", method("ml_Save", vector<vector<Token>>{vector<Token>(), vector<Token>()}, vector<Token>(), &ml_Save, true)),
+    make_pair("ml_Load", method("ml_Load", vector<vector<Token>>{vector<Token>()}, vector<Token>(), &ml_Load, true)),
 };

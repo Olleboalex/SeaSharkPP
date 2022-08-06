@@ -11,6 +11,7 @@
 #include "OpenGLSeaSharkLibrary.h"
 #include <memory>
 #include "SeaSharkML.h"
+#include "SeaSharkTimelib.h"
 //#include "irrKlangSeaShark.h"
 
 #define TOK vector<Token>
@@ -46,7 +47,8 @@ unordered_map<string, unordered_map<string, method>> ContainedLibraries{
 	make_pair("System", SystemMETHODS),
 	make_pair("FileWriter", FileWriterMETHODS),
 	make_pair("OpenGL", OpenGLSSMethods),
-	make_pair("ML", SSMLMethods)
+	make_pair("ML", SSMLMethods),
+	make_pair("Time", TimeMethods)
 	//make_pair("IrrKlang", irrKlangMethods)
 };
 
