@@ -362,7 +362,15 @@ vector<Token> LexText(string Text)
 				while (cursor < Text.size())
 				{
 					if (Text[cursor] == '"') break;
-					text += Text[cursor];
+					if (cursor < Text.size() - 1 && Text[cursor] == '\\' && Text[cursor + 1] == 'n')
+					{
+						cursor++;
+						text += '\n';
+					}
+					else
+					{
+						text += Text[cursor];
+					}
 					cursor++;
 				}
 				Token tok = Token(0);

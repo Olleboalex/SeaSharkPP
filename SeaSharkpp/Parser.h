@@ -12,6 +12,7 @@
 #include <memory>
 #include "SeaSharkML.h"
 #include "SeaSharkTimelib.h"
+#include "seasharkmath.h"
 //#include "irrKlangSeaShark.h"
 
 #define TOK vector<Token>
@@ -48,7 +49,8 @@ unordered_map<string, unordered_map<string, method>> ContainedLibraries{
 	make_pair("FileWriter", FileWriterMETHODS),
 	make_pair("OpenGL", OpenGLSSMethods),
 	make_pair("ML", SSMLMethods),
-	make_pair("Time", TimeMethods)
+	make_pair("Time", TimeMethods),
+	make_pair("Mathematics", mathMethods)
 	//make_pair("IrrKlang", irrKlangMethods)
 };
 
@@ -800,7 +802,14 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, map<st
 									{
 										propTok.EvalStatement.insert(propTok.EvalStatement.begin(), vector<Token>{objTok});
 									}
-									Token tok = ParseMethodCall(propTok, &props[objTok.ID].METHODS, Variables);
+									unordered_map<string, method> appropMethods = *methods;
+
+									for (pair <string, method> element : props[objTok.ID].METHODS)
+									{
+										appropMethods[element.first] = element.second;
+									}
+									
+									Token tok = ParseMethodCall(propTok, &appropMethods, Variables);
 									if (tok.ID == "ERROR") return tok;
 									if (tokens.size() == 2) return tok;
 									int propertyholders = 0;

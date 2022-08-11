@@ -284,6 +284,16 @@ Token append(Token MethodCall, unordered_map<string, method>* methods, map<strin
 			listToken.stringVal += appendToken.stringVal;
 			return listToken;
 		}
+		else if(appendToken.ID == "INT")
+		{
+			listToken.stringVal += to_string(appendToken.intVal);
+			return listToken;
+		}
+		else if(appendToken.ID == "FLOAT")
+		{
+			listToken.stringVal += to_string(appendToken.floatVal);
+			return listToken;
+		}
 		else
 		{
 			Token errorToken;

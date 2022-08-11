@@ -236,7 +236,6 @@ struct NeuralNetwork
                 result += ',';
             }
         }
-        cout << result << endl;
         ofstream file(path);
 		file << result;
 		file.close();
