@@ -115,7 +115,9 @@ Token ParseArithmeticMultiplyDivide(vector<Token> tokens)
 					else if (tokens[cursor].ID == "DIVIDE")
 					{
 						if (tokens[cursor + 1].ID == "FLOAT") ID = "FLOAT";
-						result /= tokens[cursor + 1].GetTokenValueAsFloat();
+						float val = tokens[cursor + 1].GetTokenValueAsFloat();
+						if(val == 0) return ErrorToken("Division by zero");
+						result /= val;
 					}
 					else
 					{
