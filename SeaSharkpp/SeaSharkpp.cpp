@@ -16,7 +16,7 @@ using namespace std;
 
 string codePath = "test.ss";
 
-string version = "2.2";
+string version = "2.26";
 
 
 int main(int argc, char** argv)
@@ -43,7 +43,24 @@ int main(int argc, char** argv)
 	}
 	else
 	{
+		AddAllContainedLibraries();
 		cout << "SeaShark version " << version << endl;
+		while(true)
+		{
+			cout << endl <<  ">>";
+			string input;
+			getline(cin, input);
+			if(input == "quit")
+			{
+				break;
+			}
+			vector<Token> toks = LexText(input);
+			Token resultToken = Parse(toks, &METHODS, &VARIABLES);
+			if(resultToken.ID == "ERROR")
+			{
+				cout << endl << "Error: " << resultToken.NAME;
+			}
+		}
 		return 0;
 	}
 

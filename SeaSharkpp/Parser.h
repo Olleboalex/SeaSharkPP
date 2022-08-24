@@ -54,6 +54,17 @@ unordered_map<string, unordered_map<string, method>> ContainedLibraries{
 	//make_pair("IrrKlang", irrKlangMethods)
 };
 
+void AddAllContainedLibraries()
+{
+	for(pair<string, unordered_map<string, method>> element : ContainedLibraries)
+	{
+		for(pair<string, method> met : element.second)
+		{
+			METHODS.insert(met);
+		}
+	}
+}
+
 Token UniversalStructSet(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	Token structToken = MethodCall.EvalStatement[0][0];
