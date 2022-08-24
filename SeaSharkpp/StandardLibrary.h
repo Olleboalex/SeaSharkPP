@@ -575,6 +575,22 @@ Token contains(Token MethodCall, unordered_map<string, method>* methods, map<str
 	}
 }
 
+Token ssBash(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
+{
+	Token cmdTok = MethodCall.EvalStatement[0][0];
+	if(cmdTok.ID == "STRING")
+	{
+		system(cmdTok.stringVal.c_str());
+	}
+	else
+	{
+		return ErrorToken("First parameter in bash() call must be of type string");
+	}
+	Token tok;
+	tok.ID = "NORETURN";
+	return tok;
+}
+
 unordered_map<string, method> SystemMETHODS
 {
 	make_pair("print", method("print", vector<vector<Token>> {vector<Token>()}, vector<Token>(), &print, true)),
@@ -590,5 +606,6 @@ unordered_map<string, method> SystemMETHODS
 	make_pair("set", method("set", vector<vector<Token>> {vector<Token>(), vector<Token>(), vector<Token>()}, vector<Token>(), &set, true)),
 	make_pair("remove", method("remove", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), &remove, true)),
 	make_pair("size", method("size", vector<vector<Token>> {vector<Token>()}, vector<Token>(), &size, true)),
-	make_pair("contains", method("contains", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), &contains, true))
+	make_pair("contains", method("contains", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), &contains, true)),
+	make_pair("bash", method("bash", vector<vector<Token>>{vector<Token>()}, vector<Token>(), &ssBash , true))
 };
