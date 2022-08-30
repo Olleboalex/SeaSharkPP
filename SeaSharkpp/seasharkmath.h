@@ -8,6 +8,9 @@
 #include <time.h>
 #include <math.h>
 
+#define M_PIf 3.14159265f
+#define M_Ef 2.71828f
+
 /*
 Returns the sine of the given float which is in radians
 */
