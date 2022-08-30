@@ -51,20 +51,50 @@ bool compareTokens(Token a, Token b)
 	return false;
 }
 
+Token Print(Token value, unordered_map<string, method>* methods, map<string, Token>* Variables)
+{
+	if(value.ID == "FLOAT")
+	{
+		cout << value.floatVal;
+	}
+	else if(value.ID == "INT")
+	{
+		cout << value.intVal;
+	}
+	else if(value.ID == "STRING")
+	{
+		cout << value.stringVal;
+	}
+	else if(value.ID == "LIST")
+	{
+		cout << "[";
+		for(int i = 0; i < value.EvalStatement.size() - 1; i++)
+		{
+			Token valTok = Parse(value.EvalStatement[i], methods, Variables);
+			if(valTok.ID == "ERROR") return valTok;
+			Print(valTok, methods, Variables);
+			cout << ", ";
+		}
+		Token vTok = Parse(value.EvalStatement[value.EvalStatement.size() - 1], methods, Variables);
+		if(vTok.ID == "ERROR") return vTok;
+		Print(vTok, methods, Variables);
+		cout << "]";
+	}
+	else if(value.ID == "ERROR")
+	{
+		return value;
+	}
+	Token tok;
+	tok.ID = "NORETURN";
+	return tok;
+}
+
 Token print(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	if (MethodCall.EvalStatement.size() == 1)
 	{
-		Token result = Parse(MethodCall.EvalStatement[0], methods, Variables);
-		if (result.ID == "FLOAT" || result.ID == "INT")
-		{
-			cout << result.GetTokenValueAsFloat();
-		}
-		else if (result.ID == "STRING")
-		{
-			cout << result.stringVal;
-		}
-		else if (result.ID == "ERROR")
+		Token result = Print(Parse(MethodCall.EvalStatement[0], methods, Variables), methods, Variables);
+		if (result.ID == "ERROR")
 		{
 			return result;
 		}
@@ -84,19 +114,12 @@ Token printline(Token MethodCall, unordered_map<string, method>* methods, map<st
 {
 	if (MethodCall.EvalStatement.size() == 1)
 	{
-		Token result = Parse(MethodCall.EvalStatement[0], methods, Variables);
-		if (result.ID == "FLOAT" || result.ID == "INT")
-		{
-			cout << result.GetTokenValueAsFloat() << endl;
-		}
-		else if (result.ID == "STRING")
-		{
-			cout << result.stringVal << endl;
-		}
-		else if (result.ID == "ERROR")
+		Token result = Print(Parse(MethodCall.EvalStatement[0], methods, Variables), methods, Variables);
+		if (result.ID == "ERROR")
 		{
 			return result;
 		}
+		cout << endl;
 	}
 	else
 	{
