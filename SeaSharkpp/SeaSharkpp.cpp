@@ -6,8 +6,8 @@
 #include <string>
 #include "ARITHMETICPARSING.h"
 #include <unordered_map>
-//#include <glad/glad.h>
-//#include <GLFW/glfw3.h>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #include "SeaSharkML.h"
 #include "seasharkmath.h"
 //#include <irrKlang/irrKlang.h>
