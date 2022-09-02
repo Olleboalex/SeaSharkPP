@@ -16,7 +16,7 @@ using namespace std;
 
 string codePath = "test.ss";
 
-string version = "2.26";
+string version = "2.30";
 
 
 int main(int argc, char** argv)
@@ -52,6 +52,12 @@ int main(int argc, char** argv)
 			if(input == "quit")
 			{
 				break;
+			}
+			else if (input == "clear")
+			{
+				system("CLS");
+				cout << "SeaShark version " << version << endl;
+				continue;
 			}
 			vector<Token> toks = LexText(input);
 			Token resultToken = Parse(toks, &METHODS, &VARIABLES);

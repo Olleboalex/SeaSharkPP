@@ -19,8 +19,8 @@ C:\Users\ealegus\source\repos\SeaSharkPP\SeaSharkpp\SeaSharkML.h(304,51): warnin
 C:\Users\ealegus\source\repos\SeaSharkPP\SeaSharkpp\SeaSharkML.h(441,47): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
 C:\Users\ealegus\source\repos\SeaSharkPP\SeaSharkpp\SeaSharkpp.cpp(29,3): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
   Generating code
-  38 of 1978 functions ( 1.9%) were compiled, the rest were copied from previous compilation.
+  40 of 1978 functions ( 2.0%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    23 functions had inline decision re-evaluated but remain unchanged
+    13 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   SeaSharkpp.vcxproj -> C:\Users\ealegus\source\repos\SeaSharkPP\SeaSharkpp\x64\Release\SeaSharkpp.exe
