@@ -378,6 +378,29 @@ vector<Token> LexText(string Text)
 				tok.stringVal = text;
 				tokens.push_back(tok);
 			}
+			else if(Text[cursor] == "'"[0])
+			{
+				cursor++;
+				string text = "";
+				while (cursor < Text.size())
+				{
+					if (Text[cursor] == "'"[0]) break;
+					if (cursor < Text.size() - 1 && Text[cursor] == '\\' && Text[cursor + 1] == 'n')
+					{
+						cursor++;
+						text += '\n';
+					}
+					else
+					{
+						text += Text[cursor];
+					}
+					cursor++;
+				}
+				Token tok = Token(0);
+				tok.ID = "STRING";
+				tok.stringVal = text;
+				tokens.push_back(tok);
+			}
 			else if (Text[cursor] == '=')
 			{
 				cursor++;
