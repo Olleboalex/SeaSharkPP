@@ -6,6 +6,13 @@
         "vector": "cpp",
         "iosfwd": "cpp",
         "system_error": "cpp",
-        "chrono": "cpp"
+        "chrono": "cpp",
+        "iostream": "cpp",
+        "ratio": "cpp",
+        "array": "cpp",
+        "functional": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp"
     }
 }

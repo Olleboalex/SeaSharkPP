@@ -91,6 +91,52 @@ Token Print(Token value, unordered_map<string, method>* methods, map<string, Tok
 	tok.ID = "NORETURN";
 	return tok;
 }
+Token ssTOSTRING(Token value, unordered_map<string, method>* methods, map<string, Token>* Variables)
+{
+	string result = "";
+	if(value.ID == "FLOAT")
+	{
+		result = to_string(value.floatVal);
+	}
+	else if(value.ID == "INT")
+	{
+		result = to_string(value.intVal);
+	}
+	else if(value.ID == "STRING")
+	{
+		return value;
+	}
+	else if(value.ID == "LIST")
+	{
+		result += "[";
+		if(value.EvalStatement.size() > 0)
+		{
+			for(int i = 0; i < value.EvalStatement.size() - 1; i++)
+			{
+				Token valTok = Parse(value.EvalStatement[i], methods, Variables);
+				if(valTok.ID == "ERROR") return valTok;
+				result += ssTOSTRING(valTok, methods, Variables).stringVal;
+				result += ", ";
+			}
+			Token vTok = Parse(value.EvalStatement[value.EvalStatement.size() - 1], methods, Variables);
+			if (vTok.ID == "ERROR") return vTok;
+			result += ssTOSTRING(vTok, methods, Variables).stringVal;
+		}
+		result += "]";
+	}
+	else if(value.ID == "ERROR")
+	{
+		return value;
+	}
+	else
+	{
+		return ErrorToken("Incorrect value type in string() call");
+	}
+	Token tok;
+	tok.ID = "STRING";
+	tok.stringVal = result;
+	return tok;
+}
 
 Token print(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
@@ -224,28 +270,7 @@ Token Float(Token MethodCall, unordered_map<string, method>* methods, map<string
 Token String(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	Token tok = MethodCall.EvalStatement[0][0];
-	Token result;
-	result.ID = "STRING";
-
-	if (tok.ID == "STRING")
-	{
-		return tok;
-	}
-	else if (tok.ID == "INT")
-	{
-		result.stringVal = to_string(tok.intVal);
-	}
-	else if (tok.ID == "FLOAT")
-	{
-		result.stringVal = to_string(tok.floatVal);
-	}
-	else
-	{
-		Token errorToken;
-		errorToken.ID = "ERROR";
-		errorToken.NAME = "Parameter in string() method call must be of type string, int or float";
-		return errorToken;
-	}
+	Token result = ssTOSTRING(tok, methods, Variables);
 
 	return result;
 }
