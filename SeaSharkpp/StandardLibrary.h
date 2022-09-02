@@ -75,9 +75,12 @@ Token Print(Token value, unordered_map<string, method>* methods, map<string, Tok
 			Print(valTok, methods, Variables);
 			cout << ", ";
 		}
-		Token vTok = Parse(value.EvalStatement[value.EvalStatement.size() - 1], methods, Variables);
-		if(vTok.ID == "ERROR") return vTok;
-		Print(vTok, methods, Variables);
+		if (value.EvalStatement.size() > 0)
+		{
+			Token vTok = Parse(value.EvalStatement[value.EvalStatement.size() - 1], methods, Variables);
+			if (vTok.ID == "ERROR") return vTok;
+			Print(vTok, methods, Variables);
+		}
 		cout << "]";
 	}
 	else if(value.ID == "ERROR")
@@ -597,6 +600,19 @@ Token contains(Token MethodCall, unordered_map<string, method>* methods, map<str
 		return ErrorToken("First parameter in contains() call must be of type list or string");
 	}
 }
+Token ssEvaluate(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
+{
+	Token codeToken = MethodCall.EvalStatement[0][0];
+	if (codeToken.ID == "STRING")
+	{
+		Token result = Parse(LexText(codeToken.stringVal), methods, Variables);
+		return result;
+	}
+	else
+	{
+		return ErrorToken("First parameter in evaluate() call must be of type string");
+	}
+}
 
 Token ssBash(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
@@ -630,5 +646,6 @@ unordered_map<string, method> SystemMETHODS
 	make_pair("remove", method("remove", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), &remove, true)),
 	make_pair("size", method("size", vector<vector<Token>> {vector<Token>()}, vector<Token>(), &size, true)),
 	make_pair("contains", method("contains", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), &contains, true)),
-	make_pair("bash", method("bash", vector<vector<Token>>{vector<Token>()}, vector<Token>(), &ssBash , true))
+	make_pair("bash", method("bash", vector<vector<Token>>{vector<Token>()}, vector<Token>(), &ssBash , true)),
+	make_pair("eval", method("eval", vector<vector<Token>>{vector<Token>()}, vector<Token>(), &ssEvaluate , true))
 };
