@@ -55,7 +55,11 @@ int main(int argc, char** argv)
 			}
 			else if (input == "clear")
 			{
+				#ifdef _WIN32
 				system("CLS");
+				#else
+				system("clear");
+				#endif
 				cout << "SeaShark version " << version << endl;
 				continue;
 			}
