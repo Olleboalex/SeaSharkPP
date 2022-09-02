@@ -68,15 +68,15 @@ Token Print(Token value, unordered_map<string, method>* methods, map<string, Tok
 	else if(value.ID == "LIST")
 	{
 		cout << "[";
-		for(int i = 0; i < value.EvalStatement.size() - 1; i++)
+		if(value.EvalStatement.size() > 0)
 		{
-			Token valTok = Parse(value.EvalStatement[i], methods, Variables);
-			if(valTok.ID == "ERROR") return valTok;
-			Print(valTok, methods, Variables);
-			cout << ", ";
-		}
-		if (value.EvalStatement.size() > 0)
-		{
+			for(int i = 0; i < value.EvalStatement.size() - 1; i++)
+			{
+				Token valTok = Parse(value.EvalStatement[i], methods, Variables);
+				if(valTok.ID == "ERROR") return valTok;
+				Print(valTok, methods, Variables);
+				cout << ", ";
+			}
 			Token vTok = Parse(value.EvalStatement[value.EvalStatement.size() - 1], methods, Variables);
 			if (vTok.ID == "ERROR") return vTok;
 			Print(vTok, methods, Variables);
