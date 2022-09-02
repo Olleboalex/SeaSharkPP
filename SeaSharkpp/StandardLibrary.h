@@ -138,7 +138,7 @@ Token read(Token MethodCall, unordered_map<string, method>* methods, map<string,
 {
 	Token tok;
 	tok.ID = "STRING";
-	cin >> tok.stringVal;
+	getline(cin, tok.stringVal);
 	return tok;
 }
 Token Int(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
@@ -613,7 +613,6 @@ Token ssEvaluate(Token MethodCall, unordered_map<string, method>* methods, map<s
 		return ErrorToken("First parameter in evaluate() call must be of type string");
 	}
 }
-
 Token ssBash(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
 {
 	Token cmdTok = MethodCall.EvalStatement[0][0];
