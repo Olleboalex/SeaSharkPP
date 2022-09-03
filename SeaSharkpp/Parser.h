@@ -22,18 +22,16 @@ using namespace std;
 unordered_set<string> MathIDS{
 	"PLUS", "MINUS", "MULTIPLY", "DIVIDE", "MOD", "LPAR", "RPAR", "RCURLBRACK", "LCURLBRACK",
 	"EQUALS", "NOTEQUALS", "BIGEQUALS", "SMALLEQUALS", "SMALLER", "BIGGER", "INCREMENT",
-	"DECREMENT", "PLUSEQUALS", "MINUSEQUALS", "MULTIPLYEQUALS", "DIVIDEEQUALS", "NOT"
-};
+	"DECREMENT", "PLUSEQUALS", "MINUSEQUALS", "MULTIPLYEQUALS", "DIVIDEEQUALS", "NOT"};
 
 unordered_map<string, method> listMethods{
-	make_pair("append", method("append", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), &append, true)),
-	make_pair("appendmultiple", method("appendmultiple", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), &appendmultiple, true)),
-	make_pair("get", method("get", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), &get, true)),
-	make_pair("set", method("set", vector<vector<Token>> {vector<Token>(), vector<Token>(), vector<Token>()}, vector<Token>(), &set, true)),
-	make_pair("remove", method("remove", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), &remove, true)),
-	make_pair("size", method("size", vector<vector<Token>> {vector<Token>()}, vector<Token>(), &size, true)),
-	make_pair("contains", method("contains", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), &contains, true))
-};
+	make_pair("append", method("append", vector<vector<Token>>{vector<Token>(), vector<Token>()}, vector<Token>(), &append, true)),
+	make_pair("appendmultiple", method("appendmultiple", vector<vector<Token>>{vector<Token>(), vector<Token>()}, vector<Token>(), &appendmultiple, true)),
+	make_pair("get", method("get", vector<vector<Token>>{vector<Token>(), vector<Token>()}, vector<Token>(), &get, true)),
+	make_pair("set", method("set", vector<vector<Token>>{vector<Token>(), vector<Token>(), vector<Token>()}, vector<Token>(), &set, true)),
+	make_pair("remove", method("remove", vector<vector<Token>>{vector<Token>(), vector<Token>()}, vector<Token>(), &remove, true)),
+	make_pair("size", method("size", vector<vector<Token>>{vector<Token>()}, vector<Token>(), &size, true)),
+	make_pair("contains", method("contains", vector<vector<Token>>{vector<Token>(), vector<Token>()}, vector<Token>(), &contains, true))};
 
 unordered_map<string, method> METHODS;
 
@@ -41,8 +39,7 @@ map<string, Token> VARIABLES;
 
 unordered_map<string, Properties> props{
 	make_pair("LIST", Properties(listMethods, map<string, Token>())),
-	make_pair("STRING", Properties(listMethods, map<string, Token>()))
-};
+	make_pair("STRING", Properties(listMethods, map<string, Token>()))};
 
 unordered_map<string, unordered_map<string, method>> ContainedLibraries{
 	make_pair("System", SystemMETHODS),
@@ -51,41 +48,108 @@ unordered_map<string, unordered_map<string, method>> ContainedLibraries{
 	make_pair("ML", SSMLMethods),
 	make_pair("Time", TimeMethods),
 	make_pair("Mathematics", mathMethods)
-	//make_pair("IrrKlang", irrKlangMethods)
+	// make_pair("IrrKlang", irrKlangMethods)
 };
 
 void AddAllContainedLibraries()
 {
-	for(pair<string, unordered_map<string, method>> element : ContainedLibraries)
+	for (pair<string, unordered_map<string, method>> element : ContainedLibraries)
 	{
-		for(pair<string, method> met : element.second)
+		for (pair<string, method> met : element.second)
 		{
 			METHODS.insert(met);
 		}
 	}
 }
 
-Token UniversalStructSet(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
+Token UniversalStructSet(Token MethodCall, unordered_map<string, method> *methods, map<string, Token> *Variables)
 {
-	Token structToken = MethodCall.EvalStatement[0][0];
-	Token IdToken = MethodCall.EvalStatement[1][0];
-	Token setVal = MethodCall.EvalStatement[2][0];
-	if(IdToken.ID == "STRING")
+	if (MethodCall.EvalStatement[0][0].ID == "METHODCOMPLEMENT")
 	{
-		if(structToken.structVars.count(IdToken.stringVal))
+		Token structToken = (*Variables)[MethodCall.EvalStatement[0][0].stringVal];
+		Token IdToken = MethodCall.EvalStatement[1][0];
+		Token setVal = MethodCall.EvalStatement[2][0];
+		if (IdToken.ID == "STRING")
 		{
-			structToken.structVars[IdToken.stringVal] = setVal;
-			return structToken;
+			if (structToken.structVars.count(IdToken.stringVal))
+			{
+				(*Variables)[MethodCall.EvalStatement[0][0].stringVal].structVars[IdToken.stringVal] = setVal;
+				return noReturnToken();
+			}
+			else
+			{
+				return ErrorToken("Property does not exist in struct");
+			}
 		}
 		else
 		{
-			cout << structToken.ID;
-			return ErrorToken("Property does not exist in struct");
+			return ErrorToken("First parameter in set() call must be of type string");
 		}
 	}
 	else
 	{
-		return ErrorToken("First parameter in set() call must be of type string");
+		Token structToken = MethodCall.EvalStatement[0][0];
+		Token IdToken = MethodCall.EvalStatement[1][0];
+		Token setVal = MethodCall.EvalStatement[2][0];
+		if (IdToken.ID == "STRING")
+		{
+			if (structToken.structVars.count(IdToken.stringVal))
+			{
+				structToken.structVars[IdToken.stringVal] = setVal;
+				return structToken;
+			}
+			else
+			{
+				return ErrorToken("Property does not exist in struct");
+			}
+		}
+		else
+		{
+			return ErrorToken("First parameter in set() call must be of type string");
+		}
+	}
+}
+Token UniversalStructGet(Token MethodCall, unordered_map<string, method> *methods, map<string, Token> *Variables)
+{
+	if (MethodCall.EvalStatement[0][0].ID == "METHODCOMPLEMENT")
+	{
+		Token structToken = (*Variables)[MethodCall.EvalStatement[0][0].stringVal];
+		Token IdToken = MethodCall.EvalStatement[1][0];
+		if (IdToken.ID == "STRING")
+		{
+			if (structToken.structVars.count(IdToken.stringVal))
+			{
+				return (*Variables)[MethodCall.EvalStatement[0][0].stringVal].structVars[IdToken.stringVal];
+			}
+			else
+			{
+				return ErrorToken("Property does not exist in struct");
+			}
+		}
+		else
+		{
+			return ErrorToken("First parameter in set() call must be of type string");
+		}
+	}
+	else
+	{
+		Token structToken = MethodCall.EvalStatement[0][0];
+		Token IdToken = MethodCall.EvalStatement[1][0];
+		if (IdToken.ID == "STRING")
+		{
+			if (structToken.structVars.count(IdToken.stringVal))
+			{
+				return structToken;
+			}
+			else
+			{
+				return ErrorToken("Property does not exist in struct");
+			}
+		}
+		else
+		{
+			return ErrorToken("First parameter in set() call must be of type string");
+		}
 	}
 }
 
@@ -93,7 +157,7 @@ Token UniversalStructSet(Token MethodCall, unordered_map<string, method>* method
 Function parses elements in methodcall parameters and if none are of type error it calls the appropriate function.
 If function call contains incorrect number of parameters returns error here.
 */
-Token SystemMethod(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
+Token SystemMethod(Token MethodCall, unordered_map<string, method> *methods, map<string, Token> *Variables)
 {
 	if ((*methods).count(MethodCall.NAME))
 	{
@@ -102,8 +166,9 @@ Token SystemMethod(Token MethodCall, unordered_map<string, method>* methods, map
 			for (int i = 0; i < MethodCall.EvalStatement.size(); i++)
 			{
 				Token result = Parse(MethodCall.EvalStatement[i], methods, Variables);
-				if (result.ID == "ERROR") return result;
-				MethodCall.EvalStatement[i] = vector<Token>{ result };
+				if (result.ID == "ERROR")
+					return result;
+				MethodCall.EvalStatement[i] = vector<Token>{result};
 			}
 			return (*methods)[MethodCall.NAME].func(MethodCall, methods, Variables);
 		}
@@ -120,7 +185,7 @@ Token SystemMethod(Token MethodCall, unordered_map<string, method>* methods, map
 
 string libPath = "./";
 
-Token ParseLib(vector<Token> tokens, unordered_map<string, method>* methods)
+Token ParseLib(vector<Token> tokens, unordered_map<string, method> *methods)
 {
 	int cursor = 0;
 	while (cursor < tokens.size())
@@ -162,17 +227,18 @@ Token ParseLib(vector<Token> tokens, unordered_map<string, method>* methods)
 					return errorTok;
 				}
 				Token libToken = ParseLib(LexText(code), methods);
-				if (libToken.ID == "ERROR") return libToken;
+				if (libToken.ID == "ERROR")
+					return libToken;
 			}
 		}
-		else if(tokens[cursor].ID == "STRUCT")
+		else if (tokens[cursor].ID == "STRUCT")
 		{
 			unordered_map<string, method> meths{
-				make_pair("set", method("set", vector<vector<Token>> {vector<Token>(), vector<Token>(), vector<Token>()}, vector<Token>(),& UniversalStructSet, true))
-			};
+				make_pair("set", method("set", vector<vector<Token>>{vector<Token>(), vector<Token>(), vector<Token>()}, vector<Token>(), &UniversalStructSet, true))};
 			map<string, Token> vars;
 			Token tok = Parse(tokens[cursor].ExecStatement, &meths, &vars);
-			if (tok.ID == "ERROR") return tok;
+			if (tok.ID == "ERROR")
+				return tok;
 			props[tokens[cursor].NAME] = Properties(meths, vars);
 		}
 		else
@@ -191,15 +257,16 @@ bool CheckIfNameIsContained(vector<vector<Token>> x, string name)
 {
 	for (int i = 0; i < x.size(); i++)
 	{
-		if (x[i][0].NAME == name) return true;
+		if (x[i][0].NAME == name)
+			return true;
 	}
 	return false;
 }
 
-Token ParseMethodCall(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
+Token ParseMethodCall(Token MethodCall, unordered_map<string, method> *methods, map<string, Token> *Variables)
 {
 
-	if(props.count(MethodCall.NAME))
+	if (props.count(MethodCall.NAME))
 	{
 		if (MethodCall.EvalStatement.size() > 1)
 		{
@@ -219,7 +286,8 @@ Token ParseMethodCall(Token MethodCall, unordered_map<string, method>* methods, 
 				return ErrorToken("Invalid constructor arguments");
 			}
 
-			if (listToken.ID == "ERROR") return listToken;
+			if (listToken.ID == "ERROR")
+				return listToken;
 
 			for (int i = 0; i < listToken.EvalStatement.size(); i += 2)
 			{
@@ -266,39 +334,39 @@ Token ParseMethodCall(Token MethodCall, unordered_map<string, method>* methods, 
 	}
 	else if ((*methods)[MethodCall.NAME].fromLib)
 	{
-	map<string, Token> funcVariables = VARIABLES;
-	for (int i = 0; i < (*methods)[MethodCall.NAME].Parameters.size(); i++)
-	{
-		vector<Token> token = { MethodCall.EvalStatement[i] };
-		funcVariables[(*methods)[MethodCall.NAME].Parameters[i][0].NAME] = Parse(token, methods, Variables);
-	}
-	Token tok = Parse((*methods)[MethodCall.NAME].ExecutionStatements, methods, &funcVariables);
-	return tok;
+		map<string, Token> funcVariables = VARIABLES;
+		for (int i = 0; i < (*methods)[MethodCall.NAME].Parameters.size(); i++)
+		{
+			vector<Token> token = {MethodCall.EvalStatement[i]};
+			funcVariables[(*methods)[MethodCall.NAME].Parameters[i][0].NAME] = Parse(token, methods, Variables);
+		}
+		Token tok = Parse((*methods)[MethodCall.NAME].ExecutionStatements, methods, &funcVariables);
+		return tok;
 	}
 	else
 	{
-	map<string, Token> funcVariables = VARIABLES;
-	for (int i = 0; i < (*methods)[MethodCall.NAME].Parameters.size(); i++)
-	{
-		vector<Token> token = { MethodCall.EvalStatement[i] };
-		funcVariables[(*methods)[MethodCall.NAME].Parameters[i][0].NAME] = Parse(token, methods, Variables);
-	}
-	Token tok = Parse((*methods)[MethodCall.NAME].ExecutionStatements, methods, &funcVariables);
-	for (pair<string, Token> element : funcVariables)
-	{
-		if (VARIABLES.count(element.first))
+		map<string, Token> funcVariables = VARIABLES;
+		for (int i = 0; i < (*methods)[MethodCall.NAME].Parameters.size(); i++)
 		{
-			if (!CheckIfNameIsContained((*methods)[MethodCall.NAME].Parameters, element.first))
+			vector<Token> token = {MethodCall.EvalStatement[i]};
+			funcVariables[(*methods)[MethodCall.NAME].Parameters[i][0].NAME] = Parse(token, methods, Variables);
+		}
+		Token tok = Parse((*methods)[MethodCall.NAME].ExecutionStatements, methods, &funcVariables);
+		for (pair<string, Token> element : funcVariables)
+		{
+			if (VARIABLES.count(element.first))
 			{
-				VARIABLES[element.first] = element.second;
+				if (!CheckIfNameIsContained((*methods)[MethodCall.NAME].Parameters, element.first))
+				{
+					VARIABLES[element.first] = element.second;
+				}
 			}
 		}
-	}
-	return tok;
+		return tok;
 	}
 }
 
-Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, map<string, Token>* Variables)
+Token Parse(vector<Token> tokens, unordered_map<string, method> *methods, map<string, Token> *Variables)
 {
 	int cursor = 0;
 	while (cursor < tokens.size())
@@ -335,7 +403,8 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, map<st
 					return errorTok;
 				}
 				Token libToken = ParseLib(LexText(code), methods);
-				if (libToken.ID == "ERROR") return libToken;
+				if (libToken.ID == "ERROR")
+					return libToken;
 			}
 		}
 		else if (tokens[cursor].ID == "IF")
@@ -391,12 +460,14 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, map<st
 			if (boolTok.boolVal)
 			{
 				Token tok = Parse(ifToken.ExecStatement, methods, Variables);
-				if (tok.ID != "NORETURN") return tok;
+				if (tok.ID != "NORETURN")
+					return tok;
 			}
 			else
 			{
 				Token res = Parse(result, methods, Variables);
-				if (res.ID != "NORETURN") return res;
+				if (res.ID != "NORETURN")
+					return res;
 			}
 		}
 		else if (tokens[cursor].ID == "WHILE")
@@ -417,8 +488,10 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, map<st
 			while (run.boolVal)
 			{
 				Token tok = Parse(tokens[cursor].ExecStatement, methods, Variables);
-				if (tok.ID != "NORETURN") return tok;
-				if (tok.ID == "ERROR") return tok;
+				if (tok.ID != "NORETURN")
+					return tok;
+				if (tok.ID == "ERROR")
+					return tok;
 				run = ParseBool(tokens[cursor].EvalStatement[0], methods, Variables);
 				if (run.ID == "ERROR")
 				{
@@ -440,24 +513,25 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, map<st
 		}
 		else if (tokens[cursor].ID == "VAR")
 		{
-			if (cursor < tokens.size() - 1 && tokens[cursor + 1].ID == "DOT") 
+			if (cursor < tokens.size() - 1 && tokens[cursor + 1].ID == "DOT")
 			{
-
 			}
-			else 
+			else
 			{
 				if (!(*Variables).count(tokens[cursor].NAME))
 				{
 					(*Variables)[tokens[cursor].NAME] = Token(0);
 				}
-				if (tokens.size() == 1) return (*Variables)[tokens[cursor].NAME];
+				if (tokens.size() == 1)
+					return (*Variables)[tokens[cursor].NAME];
 			}
 		}
 		else if (tokens[cursor].ID == "SETEQUALS")
 		{
 			Token tok = Parse(tokens[cursor].EvalStatement[0], methods, Variables);
 
-			if (tok.ID == "ERROR") return tok;
+			if (tok.ID == "ERROR")
+				return tok;
 
 			if (cursor > 0 && tokens[cursor - 1].ID == "VAR")
 			{
@@ -474,7 +548,8 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, map<st
 		else if (tokens[cursor].ID == "PLUSEQUALS")
 		{
 			Token tok = Parse(tokens[cursor].EvalStatement[0], methods, Variables);
-			if (tok.ID == "ERROR") return tok;
+			if (tok.ID == "ERROR")
+				return tok;
 			if (tok.ID != "FLOAT" && tok.ID != "INT")
 			{
 				Token errorToken;
@@ -520,7 +595,8 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, map<st
 		else if (tokens[cursor].ID == "MINUSEQUALS")
 		{
 			Token tok = Parse(tokens[cursor].EvalStatement[0], methods, Variables);
-			if (tok.ID == "ERROR") return tok;
+			if (tok.ID == "ERROR")
+				return tok;
 			if (tok.ID != "FLOAT" && tok.ID != "INT")
 			{
 				Token errorToken;
@@ -566,7 +642,8 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, map<st
 		else if (tokens[cursor].ID == "MULTIPLYEQUALS")
 		{
 			Token tok = Parse(tokens[cursor].EvalStatement[0], methods, Variables);
-			if (tok.ID == "ERROR") return tok;
+			if (tok.ID == "ERROR")
+				return tok;
 			if (tok.ID != "FLOAT" && tok.ID != "INT")
 			{
 				Token errorToken;
@@ -612,7 +689,8 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, map<st
 		else if (tokens[cursor].ID == "DIVIDEEQUALS")
 		{
 			Token tok = Parse(tokens[cursor].EvalStatement[0], methods, Variables);
-			if (tok.ID == "ERROR") return tok;
+			if (tok.ID == "ERROR")
+				return tok;
 			if (tok.ID != "FLOAT" && tok.ID != "INT")
 			{
 				Token errorToken;
@@ -716,8 +794,10 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, map<st
 			if (!(cursor < tokens.size() - 1 && tokens[cursor + 1].ID == "DOT"))
 			{
 				Token tok = ParseMethodCall(tokens[cursor], methods, Variables);
-				if (tok.ID == "ERROR") return tok;
-				if (tokens.size() == 1) return tok;
+				if (tok.ID == "ERROR")
+					return tok;
+				if (tokens.size() == 1)
+					return tok;
 			}
 		}
 		else if (tokens[cursor].ID == "LIST")
@@ -727,7 +807,8 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, map<st
 			for (int i = 0; i < tokens[cursor].EvalStatement.size(); i++)
 			{
 				Token elementToken = Parse(tokens[cursor].EvalStatement[i], methods, Variables);
-				if (elementToken.ID == "ERROR") return elementToken;
+				if (elementToken.ID == "ERROR")
+					return elementToken;
 				tok.EvalStatement.push_back(vector<Token>{elementToken});
 			}
 			if (tokens.size() == 1)
@@ -735,9 +816,9 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, map<st
 				return tok;
 			}
 		}
-		else if(tokens[cursor].ID == "DOT")
+		else if (tokens[cursor].ID == "DOT")
 		{
-			if(cursor < tokens.size() - 1 && tokens[cursor + 1].ID == "DOT")
+			if (cursor < tokens.size() - 1 && tokens[cursor + 1].ID == "DOT")
 			{
 			}
 			else
@@ -762,12 +843,14 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, map<st
 					else if (objTok.ID == "METHOD")
 					{
 						objTok = ParseMethodCall(objTok, methods, Variables);
-						if (objTok.ID == "ERROR") return objTok;
+						if (objTok.ID == "ERROR")
+							return objTok;
 					}
 					else if (objTok.ID == "DOT")
 					{
 						objTok = Parse(vector<Token>{tokens[cursor - 2], tokens[cursor - 1]}, methods, Variables);
-						if (objTok.ID == "ERROR") return objTok;
+						if (objTok.ID == "ERROR")
+							return objTok;
 					}
 
 					if (props.count(objTok.ID))
@@ -780,8 +863,10 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, map<st
 								if (objTok.structVars.count(propTok.NAME))
 								{
 									Token tok = objTok.structVars[propTok.NAME];
-									if (tok.ID == "ERROR") return tok;
-									if (tokens.size() == 2) return tok;
+									if (tok.ID == "ERROR")
+										return tok;
+									if (tokens.size() == 2)
+										return tok;
 									int propertyholders = 0;
 									bool check = true;
 									for (int i = 0; i < tokens.size(); i++)
@@ -800,7 +885,8 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, map<st
 											check = false;
 										}
 									}
-									if (check) return tok;
+									if (check)
+										return tok;
 								}
 								else
 								{
@@ -821,14 +907,16 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, map<st
 									}
 									unordered_map<string, method> appropMethods = *methods;
 
-									for (pair <string, method> element : props[objTok.ID].METHODS)
+									for (pair<string, method> element : props[objTok.ID].METHODS)
 									{
 										appropMethods[element.first] = element.second;
 									}
-									
+
 									Token tok = ParseMethodCall(propTok, &appropMethods, Variables);
-									if (tok.ID == "ERROR") return tok;
-									if (tokens.size() == 2) return tok;
+									if (tok.ID == "ERROR")
+										return tok;
+									if (tokens.size() == 2)
+										return tok;
 									int propertyholders = 0;
 									bool check = true;
 									for (int i = 0; i < tokens.size(); i++)
@@ -847,7 +935,8 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, map<st
 											check = false;
 										}
 									}
-									if (check) return tok;
+									if (check)
+										return tok;
 								}
 								else
 								{
@@ -875,14 +964,15 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, map<st
 				}
 			}
 		}
-		else if(tokens[cursor].ID == "STRUCT")
+		else if (tokens[cursor].ID == "STRUCT")
 		{
 			unordered_map<string, method> meths{
-				make_pair("set", method("set", vector<vector<Token>> {vector<Token>(), vector<Token>(), vector<Token>()}, vector<Token>(),& UniversalStructSet, true))
-			};
+				make_pair("set", method("set", vector<vector<Token>>{vector<Token>(), vector<Token>(), vector<Token>()}, vector<Token>(), &UniversalStructSet, true)), 
+				make_pair("get", method("get", vector<vector<Token>>{vector<Token>(), vector<Token>()}, vector<Token>(), &UniversalStructGet, true))};
 			map<string, Token> vars;
 			Token tok = Parse(tokens[cursor].ExecStatement, &meths, &vars);
-			if (tok.ID == "ERROR") return tok;
+			if (tok.ID == "ERROR")
+				return tok;
 			props[tokens[cursor].NAME] = Properties(meths, vars);
 		}
 		else if (tokens[cursor].ID == "RETURN")
@@ -907,7 +997,8 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, map<st
 		}
 		else
 		{
-			if (tokens.size() == 1) return tokens[cursor];
+			if (tokens.size() == 1)
+				return tokens[cursor];
 			Token errorToken;
 			errorToken.ID = "ERROR";
 			errorToken.NAME = "Unable to parse token";
