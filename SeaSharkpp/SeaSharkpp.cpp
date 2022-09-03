@@ -34,9 +34,16 @@ int main(int argc, char** argv)
 				break;
 			}
 		}
-		for (int i = 0; i <= val; i++)
+		if(val == 0)
 		{
-			temp += argv[1][i];
+			temp = "./";
+		}
+		else
+		{
+			for (int i = 0; i <= val; i++)
+			{
+				temp += argv[1][i];
+			}
 		}
 		libPath = temp;
 	}
