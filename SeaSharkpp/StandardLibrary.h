@@ -6,6 +6,7 @@
 #include <fstream>
 #include <string>
 #include <time.h>
+#include "Parser.h"
 
 unsigned int randomSeed = time(NULL);
 
@@ -51,39 +52,41 @@ bool compareTokens(Token a, Token b)
 	return false;
 }
 
-Token Print(Token value, unordered_map<string, method>* methods, map<string, Token>* Variables)
+Token Print(Token value, unordered_map<string, method> *methods, map<string, Token> *Variables)
 {
-	if(value.ID == "FLOAT")
+	if (value.ID == "FLOAT")
 	{
 		cout << value.floatVal;
 	}
-	else if(value.ID == "INT")
+	else if (value.ID == "INT")
 	{
 		cout << value.intVal;
 	}
-	else if(value.ID == "STRING")
+	else if (value.ID == "STRING")
 	{
 		cout << value.stringVal;
 	}
-	else if(value.ID == "LIST")
+	else if (value.ID == "LIST")
 	{
 		cout << "[";
-		if(value.EvalStatement.size() > 0)
+		if (value.EvalStatement.size() > 0)
 		{
-			for(int i = 0; i < value.EvalStatement.size() - 1; i++)
+			for (int i = 0; i < value.EvalStatement.size() - 1; i++)
 			{
 				Token valTok = Parse(value.EvalStatement[i], methods, Variables);
-				if(valTok.ID == "ERROR") return valTok;
+				if (valTok.ID == "ERROR")
+					return valTok;
 				Print(valTok, methods, Variables);
 				cout << ", ";
 			}
 			Token vTok = Parse(value.EvalStatement[value.EvalStatement.size() - 1], methods, Variables);
-			if (vTok.ID == "ERROR") return vTok;
+			if (vTok.ID == "ERROR")
+				return vTok;
 			Print(vTok, methods, Variables);
 		}
 		cout << "]";
 	}
-	else if(value.ID == "ERROR")
+	else if (value.ID == "ERROR")
 	{
 		return value;
 	}
@@ -91,40 +94,42 @@ Token Print(Token value, unordered_map<string, method>* methods, map<string, Tok
 	tok.ID = "NORETURN";
 	return tok;
 }
-Token ssTOSTRING(Token value, unordered_map<string, method>* methods, map<string, Token>* Variables)
+Token ssTOSTRING(Token value, unordered_map<string, method> *methods, map<string, Token> *Variables)
 {
 	string result = "";
-	if(value.ID == "FLOAT")
+	if (value.ID == "FLOAT")
 	{
 		result = to_string(value.floatVal);
 	}
-	else if(value.ID == "INT")
+	else if (value.ID == "INT")
 	{
 		result = to_string(value.intVal);
 	}
-	else if(value.ID == "STRING")
+	else if (value.ID == "STRING")
 	{
 		return value;
 	}
-	else if(value.ID == "LIST")
+	else if (value.ID == "LIST")
 	{
 		result += "[";
-		if(value.EvalStatement.size() > 0)
+		if (value.EvalStatement.size() > 0)
 		{
-			for(int i = 0; i < value.EvalStatement.size() - 1; i++)
+			for (int i = 0; i < value.EvalStatement.size() - 1; i++)
 			{
 				Token valTok = Parse(value.EvalStatement[i], methods, Variables);
-				if(valTok.ID == "ERROR") return valTok;
+				if (valTok.ID == "ERROR")
+					return valTok;
 				result += ssTOSTRING(valTok, methods, Variables).stringVal;
 				result += ", ";
 			}
 			Token vTok = Parse(value.EvalStatement[value.EvalStatement.size() - 1], methods, Variables);
-			if (vTok.ID == "ERROR") return vTok;
+			if (vTok.ID == "ERROR")
+				return vTok;
 			result += ssTOSTRING(vTok, methods, Variables).stringVal;
 		}
 		result += "]";
 	}
-	else if(value.ID == "ERROR")
+	else if (value.ID == "ERROR")
 	{
 		return value;
 	}
@@ -138,7 +143,7 @@ Token ssTOSTRING(Token value, unordered_map<string, method>* methods, map<string
 	return tok;
 }
 
-Token print(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
+Token print(Token MethodCall, unordered_map<string, method> *methods, map<string, Token> *Variables)
 {
 	if (MethodCall.EvalStatement.size() == 1)
 	{
@@ -159,7 +164,7 @@ Token print(Token MethodCall, unordered_map<string, method>* methods, map<string
 	tokk.ID = "NORETURN";
 	return tokk;
 }
-Token printline(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
+Token printline(Token MethodCall, unordered_map<string, method> *methods, map<string, Token> *Variables)
 {
 	if (MethodCall.EvalStatement.size() == 1)
 	{
@@ -180,14 +185,14 @@ Token printline(Token MethodCall, unordered_map<string, method>* methods, map<st
 	tokk.ID = "NORETURN";
 	return tokk;
 }
-Token read(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
+Token read(Token MethodCall, unordered_map<string, method> *methods, map<string, Token> *Variables)
 {
 	Token tok;
 	tok.ID = "STRING";
 	getline(cin, tok.stringVal);
 	return tok;
 }
-Token Int(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
+Token Int(Token MethodCall, unordered_map<string, method> *methods, map<string, Token> *Variables)
 {
 	if (MethodCall.EvalStatement.size() != 1 || MethodCall.EvalStatement[0].size() != 1)
 	{
@@ -227,7 +232,7 @@ Token Int(Token MethodCall, unordered_map<string, method>* methods, map<string, 
 		return errorTok;
 	}
 }
-Token Float(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
+Token Float(Token MethodCall, unordered_map<string, method> *methods, map<string, Token> *Variables)
 {
 	if (MethodCall.EvalStatement.size() != 1 || MethodCall.EvalStatement[0].size() != 1)
 	{
@@ -267,14 +272,14 @@ Token Float(Token MethodCall, unordered_map<string, method>* methods, map<string
 		return errorTok;
 	}
 }
-Token String(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
+Token String(Token MethodCall, unordered_map<string, method> *methods, map<string, Token> *Variables)
 {
 	Token tok = MethodCall.EvalStatement[0][0];
 	Token result = ssTOSTRING(tok, methods, Variables);
 
 	return result;
 }
-Token random(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
+Token random(Token MethodCall, unordered_map<string, method> *methods, map<string, Token> *Variables)
 {
 	if (MethodCall.EvalStatement.size() == 2)
 	{
@@ -309,7 +314,6 @@ Token random(Token MethodCall, unordered_map<string, method>* methods, map<strin
 			errorToken.NAME = "Parameters in random() must be of type int";
 			return errorToken;
 		}
-
 	}
 	else
 	{
@@ -319,78 +323,153 @@ Token random(Token MethodCall, unordered_map<string, method>* methods, map<strin
 		return errorToken;
 	}
 }
-Token append(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
+Token append(Token MethodCall, unordered_map<string, method> *methods, map<string, Token> *Variables)
 {
-	Token listToken = MethodCall.EvalStatement[0][0];
-	if (listToken.ID == "LIST")
+	if (MethodCall.EvalStatement[0][0].ID == "METHODCOMPLEMENT")
 	{
-		listToken.EvalStatement.push_back(vector<Token>{MethodCall.EvalStatement[1][0]});
-		return listToken;
-	}
-	else if (listToken.ID == "STRING")
-	{
-		Token appendToken = MethodCall.EvalStatement[1][0];
-		if (appendToken.ID == "STRING")
+		Token listToken = (*Variables)[MethodCall.EvalStatement[0][0].stringVal];
+		if (listToken.ID == "LIST")
 		{
-			listToken.stringVal += appendToken.stringVal;
-			return listToken;
+			(*Variables)[MethodCall.EvalStatement[0][0].stringVal].EvalStatement.push_back(vector<Token>{MethodCall.EvalStatement[1][0]});
+			return noReturnToken();
 		}
-		else if(appendToken.ID == "INT")
+		else if (listToken.ID == "STRING")
 		{
-			listToken.stringVal += to_string(appendToken.intVal);
-			return listToken;
-		}
-		else if(appendToken.ID == "FLOAT")
-		{
-			listToken.stringVal += to_string(appendToken.floatVal);
-			return listToken;
+			Token appendToken = MethodCall.EvalStatement[1][0];
+			if (appendToken.ID == "STRING")
+			{
+				(*Variables)[MethodCall.EvalStatement[0][0].stringVal].stringVal += appendToken.stringVal;
+				return (*Variables)[MethodCall.EvalStatement[0][0].stringVal];
+			}
+			else if (appendToken.ID == "INT")
+			{
+				(*Variables)[MethodCall.EvalStatement[0][0].stringVal].stringVal += to_string(appendToken.intVal);
+				return (*Variables)[MethodCall.EvalStatement[0][0].stringVal];
+			}
+			else if (appendToken.ID == "FLOAT")
+			{
+				(*Variables)[MethodCall.EvalStatement[0][0].stringVal].stringVal += to_string(appendToken.floatVal);
+				return (*Variables)[MethodCall.EvalStatement[0][0].stringVal];
+			}
+			else
+			{
+				Token errorToken;
+				errorToken.ID = "ERROR";
+				errorToken.NAME = "append value to string must be of type string";
+				return errorToken;
+			}
 		}
 		else
 		{
 			Token errorToken;
 			errorToken.ID = "ERROR";
-			errorToken.NAME = "append value to string must be of type string";
+			errorToken.NAME = "First parameter in append() must be of type list or string";
 			return errorToken;
 		}
 	}
 	else
 	{
-		Token errorToken;
-		errorToken.ID = "ERROR";
-		errorToken.NAME = "First parameter in append() must be of type list or string";
-		return errorToken;
-	}
-}
-Token appendmultiple(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
-{
-	Token listToken = MethodCall.EvalStatement[0][0];
-	if (listToken.ID == "LIST")
-	{
-		Token appendToken = MethodCall.EvalStatement[1][0];
-		if(appendToken.ID == "LIST")
+		Token listToken = MethodCall.EvalStatement[0][0];
+		if (listToken.ID == "LIST")
 		{
-			for (int i = 0; i < appendToken.EvalStatement.size(); i++)
-			{
-				listToken.EvalStatement.push_back(appendToken.EvalStatement[i]);
-			}
+			listToken.EvalStatement.push_back(vector<Token>{MethodCall.EvalStatement[1][0]});
 			return listToken;
+		}
+		else if (listToken.ID == "STRING")
+		{
+			Token appendToken = MethodCall.EvalStatement[1][0];
+			if (appendToken.ID == "STRING")
+			{
+				listToken.stringVal += appendToken.stringVal;
+				return listToken;
+			}
+			else if (appendToken.ID == "INT")
+			{
+				listToken.stringVal += to_string(appendToken.intVal);
+				return listToken;
+			}
+			else if (appendToken.ID == "FLOAT")
+			{
+				listToken.stringVal += to_string(appendToken.floatVal);
+				return listToken;
+			}
+			else
+			{
+				Token errorToken;
+				errorToken.ID = "ERROR";
+				errorToken.NAME = "append value to string must be of type string";
+				return errorToken;
+			}
 		}
 		else
 		{
-			return ErrorToken("Second parameter in appendmultiple() call must be of type list");
+			Token errorToken;
+			errorToken.ID = "ERROR";
+			errorToken.NAME = "First parameter in append() must be of type list or string";
+			return errorToken;
+		}
+	}
+}
+Token appendmultiple(Token MethodCall, unordered_map<string, method> *methods, map<string, Token> *Variables)
+{
+	if (MethodCall.EvalStatement[0][0].ID == "METHODCOMPLEMENT")
+	{
+		Token listToken = (*Variables)[MethodCall.EvalStatement[0][0].stringVal];
+		if (listToken.ID == "LIST")
+		{
+			Token appendToken = MethodCall.EvalStatement[1][0];
+			if (appendToken.ID == "LIST")
+			{
+				for (int i = 0; i < appendToken.EvalStatement.size(); i++)
+				{
+					(*Variables)[MethodCall.EvalStatement[0][0].stringVal].EvalStatement.push_back(appendToken.EvalStatement[i]);
+				}
+				return noReturnToken();
+			}
+			else
+			{
+				return ErrorToken("Second parameter in appendmultiple() call must be of type list");
+			}
+		}
+		else
+		{
+			Token errorToken;
+			errorToken.ID = "ERROR";
+			errorToken.NAME = "First parameter in appendmultiple() must be of type list";
+			return errorToken;
 		}
 	}
 	else
 	{
-		Token errorToken;
-		errorToken.ID = "ERROR";
-		errorToken.NAME = "First parameter in appendmultiple() must be of type list";
-		return errorToken;
+		Token listToken = MethodCall.EvalStatement[0][0];
+		if (listToken.ID == "LIST")
+		{
+			Token appendToken = MethodCall.EvalStatement[1][0];
+			if (appendToken.ID == "LIST")
+			{
+				for (int i = 0; i < appendToken.EvalStatement.size(); i++)
+				{
+					listToken.EvalStatement.push_back(appendToken.EvalStatement[i]);
+				}
+				return listToken;
+			}
+			else
+			{
+				return ErrorToken("Second parameter in appendmultiple() call must be of type list");
+			}
+		}
+		else
+		{
+			Token errorToken;
+			errorToken.ID = "ERROR";
+			errorToken.NAME = "First parameter in appendmultiple() must be of type list";
+			return errorToken;
+		}
 	}
 }
-Token get(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
+Token get(Token MethodCall, unordered_map<string, method> *methods, map<string, Token> *Variables)
 {
-	Token listToken = MethodCall.EvalStatement[0][0];
+	Token listToken = (MethodCall.EvalStatement[0][0].ID == "METHODCOMPLEMENT") ? (*Variables)[MethodCall.EvalStatement[0][0].stringVal] : MethodCall.EvalStatement[0][0];
 
 	if (listToken.ID == "LIST")
 	{
@@ -452,26 +531,61 @@ Token get(Token MethodCall, unordered_map<string, method>* methods, map<string, 
 		errorToken.NAME = "First parameter in get() call must be of type list";
 		return errorToken;
 	}
-
 }
-Token remove(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
+Token remove(Token MethodCall, unordered_map<string, method> *methods, map<string, Token> *Variables)
 {
-	Token listToken = MethodCall.EvalStatement[0][0];
-	if (listToken.ID == "LIST")
+	if (MethodCall.EvalStatement[0][0].ID == "METHODCOMPLEMENT")
 	{
-		Token indexToken = MethodCall.EvalStatement[1][0];
-		if (indexToken.ID == "INT")
+		Token listToken = (*Variables)[MethodCall.EvalStatement[0][0].stringVal];
+		if (listToken.ID == "LIST")
 		{
-			if (indexToken.intVal < listToken.EvalStatement.size())
+			Token indexToken = MethodCall.EvalStatement[1][0];
+			if (indexToken.ID == "INT")
 			{
-				listToken.EvalStatement.erase(listToken.EvalStatement.begin() + indexToken.intVal);
-				return listToken;
+				if (indexToken.intVal < listToken.EvalStatement.size())
+				{
+					(*Variables)[MethodCall.EvalStatement[0][0].stringVal].EvalStatement.erase((*Variables)[MethodCall.EvalStatement[0][0].stringVal].EvalStatement.begin() + indexToken.intVal);
+					return noReturnToken();
+				}
+				else
+				{
+					Token errorToken;
+					errorToken.ID = "ERROR";
+					errorToken.NAME = "Cant access index in list that does not exist";
+					return errorToken;
+				}
 			}
 			else
 			{
 				Token errorToken;
 				errorToken.ID = "ERROR";
-				errorToken.NAME = "Cant access index in list that does not exist";
+				errorToken.NAME = "Second parameter in remove() call must be of type int";
+				return errorToken;
+			}
+		}
+		else if (listToken.ID == "STRING")
+		{
+			Token indexToken = MethodCall.EvalStatement[1][0];
+			if (indexToken.ID == "INT")
+			{
+				if (indexToken.intVal < listToken.stringVal.size())
+				{
+					(*Variables)[MethodCall.EvalStatement[0][0].stringVal].stringVal.erase((*Variables)[MethodCall.EvalStatement[0][0].stringVal].stringVal.begin() + indexToken.intVal);
+					return noReturnToken();
+				}
+				else
+				{
+					Token errorToken;
+					errorToken.ID = "ERROR";
+					errorToken.NAME = "Cant access index in string that does not exist";
+					return errorToken;
+				}
+			}
+			else
+			{
+				Token errorToken;
+				errorToken.ID = "ERROR";
+				errorToken.NAME = "Second parameter in remove() call must be of type int";
 				return errorToken;
 			}
 		}
@@ -479,84 +593,154 @@ Token remove(Token MethodCall, unordered_map<string, method>* methods, map<strin
 		{
 			Token errorToken;
 			errorToken.ID = "ERROR";
-			errorToken.NAME = "Second parameter in remove() call must be of type int";
-			return errorToken;
-		}
-	}
-	else if (listToken.ID == "STRING")
-	{
-		Token indexToken = MethodCall.EvalStatement[1][0];
-		if (indexToken.ID == "INT")
-		{
-			if (indexToken.intVal < listToken.stringVal.size())
-			{
-				listToken.stringVal.erase(listToken.stringVal.begin() + indexToken.intVal);
-				return listToken;
-			}
-			else
-			{
-				Token errorToken;
-				errorToken.ID = "ERROR";
-				errorToken.NAME = "Cant access index in string that does not exist";
-				return errorToken;
-			}
-		}
-		else
-		{
-			Token errorToken;
-			errorToken.ID = "ERROR";
-			errorToken.NAME = "Second parameter in remove() call must be of type int";
-			return errorToken;
-		}
-	}
-	else
-	{
-		Token errorToken;
-		errorToken.ID = "ERROR";
-		errorToken.NAME = "First parameter in remove() call must be of type list or string";
-		return errorToken;
-	}
-}
-Token set(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
-{
-	Token listToken = MethodCall.EvalStatement[0][0];
-	if (listToken.ID == "LIST")
-	{
-		Token indexToken = MethodCall.EvalStatement[1][0];
-		if (indexToken.ID == "INT")
-		{
-			if (indexToken.intVal < listToken.EvalStatement.size())
-			{
-				listToken.EvalStatement[indexToken.intVal] = vector<Token>{ MethodCall.EvalStatement[2][0] };
-				return listToken;
-			}
-			else
-			{
-				Token errorToken;
-				errorToken.ID = "ERROR";
-				errorToken.NAME = "Cant access index that does not exist in list";
-				return errorToken;
-			}
-		}
-		else
-		{
-			Token errorToken;
-			errorToken.ID = "ERROR";
-			errorToken.NAME = "Second parameter in set() call must be of type int";
+			errorToken.NAME = "First parameter in remove() call must be of type list or string";
 			return errorToken;
 		}
 	}
 	else
 	{
-		Token errorToken;
-		errorToken.ID = "ERROR";
-		errorToken.NAME = "First parameter in set() call must be of type list";
-		return errorToken;
+		Token listToken = MethodCall.EvalStatement[0][0];
+		if (listToken.ID == "LIST")
+		{
+			Token indexToken = MethodCall.EvalStatement[1][0];
+			if (indexToken.ID == "INT")
+			{
+				if (indexToken.intVal < listToken.EvalStatement.size())
+				{
+					listToken.EvalStatement.erase(listToken.EvalStatement.begin() + indexToken.intVal);
+					return listToken;
+				}
+				else
+				{
+					Token errorToken;
+					errorToken.ID = "ERROR";
+					errorToken.NAME = "Cant access index in list that does not exist";
+					return errorToken;
+				}
+			}
+			else
+			{
+				Token errorToken;
+				errorToken.ID = "ERROR";
+				errorToken.NAME = "Second parameter in remove() call must be of type int";
+				return errorToken;
+			}
+		}
+		else if (listToken.ID == "STRING")
+		{
+			Token indexToken = MethodCall.EvalStatement[1][0];
+			if (indexToken.ID == "INT")
+			{
+				if (indexToken.intVal < listToken.stringVal.size())
+				{
+					listToken.stringVal.erase(listToken.stringVal.begin() + indexToken.intVal);
+					return listToken;
+				}
+				else
+				{
+					Token errorToken;
+					errorToken.ID = "ERROR";
+					errorToken.NAME = "Cant access index in string that does not exist";
+					return errorToken;
+				}
+			}
+			else
+			{
+				Token errorToken;
+				errorToken.ID = "ERROR";
+				errorToken.NAME = "Second parameter in remove() call must be of type int";
+				return errorToken;
+			}
+		}
+		else
+		{
+			Token errorToken;
+			errorToken.ID = "ERROR";
+			errorToken.NAME = "First parameter in remove() call must be of type list or string";
+			return errorToken;
+		}
 	}
 }
-Token size(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
+Token set(Token MethodCall, unordered_map<string, method> *methods, map<string, Token> *Variables)
 {
-	Token listToken = MethodCall.EvalStatement[0][0];
+	if (MethodCall.EvalStatement[0][0].ID == "METHODCOMPLEMENT")
+	{
+		Token listToken = (*Variables)[MethodCall.EvalStatement[0][0].stringVal];
+		if (listToken.ID == "LIST")
+		{
+			Token indexToken = MethodCall.EvalStatement[1][0];
+			if (indexToken.ID == "INT")
+			{
+				if (indexToken.intVal < listToken.EvalStatement.size())
+				{
+					(*Variables)[MethodCall.EvalStatement[0][0].stringVal].EvalStatement[indexToken.intVal] = vector<Token>{MethodCall.EvalStatement[2][0]};
+					return noReturnToken();
+				}
+				else
+				{
+					Token errorToken;
+					errorToken.ID = "ERROR";
+					errorToken.NAME = "Cant access index that does not exist in list";
+					return errorToken;
+				}
+			}
+			else
+			{
+				Token errorToken;
+				errorToken.ID = "ERROR";
+				errorToken.NAME = "Second parameter in set() call must be of type int";
+				return errorToken;
+			}
+		}
+		else
+		{
+			Token errorToken;
+			errorToken.ID = "ERROR";
+			errorToken.NAME = "First parameter in set() call must be of type list";
+			return errorToken;
+		}
+	}
+	else
+	{
+		Token listToken = MethodCall.EvalStatement[0][0];
+		if (listToken.ID == "LIST")
+		{
+			Token indexToken = MethodCall.EvalStatement[1][0];
+			if (indexToken.ID == "INT")
+			{
+				if (indexToken.intVal < listToken.EvalStatement.size())
+				{
+					listToken.EvalStatement[indexToken.intVal] = vector<Token>{MethodCall.EvalStatement[2][0]};
+					return listToken;
+				}
+				else
+				{
+					Token errorToken;
+					errorToken.ID = "ERROR";
+					errorToken.NAME = "Cant access index that does not exist in list";
+					return errorToken;
+				}
+			}
+			else
+			{
+				Token errorToken;
+				errorToken.ID = "ERROR";
+				errorToken.NAME = "Second parameter in set() call must be of type int";
+				return errorToken;
+			}
+		}
+		else
+		{
+			Token errorToken;
+			errorToken.ID = "ERROR";
+			errorToken.NAME = "First parameter in set() call must be of type list";
+			return errorToken;
+		}
+	}
+}
+Token size(Token MethodCall, unordered_map<string, method> *methods, map<string, Token> *Variables)
+{
+	Token listToken = (MethodCall.EvalStatement[0][0].ID == "METHODCOMPLEMENT") ? (*Variables)[MethodCall.EvalStatement[0][0].stringVal] : MethodCall.EvalStatement[0][0];
 	if (listToken.ID == "LIST")
 	{
 		Token result;
@@ -579,9 +763,9 @@ Token size(Token MethodCall, unordered_map<string, method>* methods, map<string,
 		return errorToken;
 	}
 }
-Token contains(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
+Token contains(Token MethodCall, unordered_map<string, method> *methods, map<string, Token> *Variables)
 {
-	Token listToken = MethodCall.EvalStatement[0][0];
+	Token listToken = (MethodCall.EvalStatement[0][0].ID == "METHODCOMPLEMENT") ? (*Variables)[MethodCall.EvalStatement[0][0].stringVal] : MethodCall.EvalStatement[0][0];
 	if (listToken.ID == "LIST")
 	{
 		Token checkToken = MethodCall.EvalStatement[1][0];
@@ -625,7 +809,7 @@ Token contains(Token MethodCall, unordered_map<string, method>* methods, map<str
 		return ErrorToken("First parameter in contains() call must be of type list or string");
 	}
 }
-Token ssEvaluate(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
+Token ssEvaluate(Token MethodCall, unordered_map<string, method> *methods, map<string, Token> *Variables)
 {
 	Token codeToken = MethodCall.EvalStatement[0][0];
 	if (codeToken.ID == "STRING")
@@ -638,10 +822,10 @@ Token ssEvaluate(Token MethodCall, unordered_map<string, method>* methods, map<s
 		return ErrorToken("First parameter in evaluate() call must be of type string");
 	}
 }
-Token ssBash(Token MethodCall, unordered_map<string, method>* methods, map<string, Token>* Variables)
+Token ssBash(Token MethodCall, unordered_map<string, method> *methods, map<string, Token> *Variables)
 {
 	Token cmdTok = MethodCall.EvalStatement[0][0];
-	if(cmdTok.ID == "STRING")
+	if (cmdTok.ID == "STRING")
 	{
 		system(cmdTok.stringVal.c_str());
 	}
@@ -654,22 +838,20 @@ Token ssBash(Token MethodCall, unordered_map<string, method>* methods, map<strin
 	return tok;
 }
 
-unordered_map<string, method> SystemMETHODS
-{
-	make_pair("print", method("print", vector<vector<Token>> {vector<Token>()}, vector<Token>(), &print, true)),
-	make_pair("printline", method("printline", vector<vector<Token>> {vector<Token>()}, vector<Token>(), &printline, true)),
+unordered_map<string, method> SystemMETHODS{
+	make_pair("print", method("print", vector<vector<Token>>{vector<Token>()}, vector<Token>(), &print, true)),
+	make_pair("printline", method("printline", vector<vector<Token>>{vector<Token>()}, vector<Token>(), &printline, true)),
 	make_pair("read", method("read", vector<vector<Token>>(), vector<Token>(), &read, true)),
-	make_pair("int", method("int", vector<vector<Token>> {vector<Token>()}, vector<Token>(), &Int, true)),
-	make_pair("float", method("float", vector<vector<Token>> {vector<Token>()}, vector<Token>(), &Float, true)),
-	make_pair("string", method("string", vector<vector<Token>> {vector<Token>()}, vector<Token>(), &String, true)),
-	make_pair("random", method("random", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), &random, true)),
-	make_pair("append", method("append", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), &append, true)),
-	make_pair("appendmultiple", method("appendmultiple", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), &appendmultiple, true)),
-	make_pair("get", method("get", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), &get, true)),
-	make_pair("set", method("set", vector<vector<Token>> {vector<Token>(), vector<Token>(), vector<Token>()}, vector<Token>(), &set, true)),
-	make_pair("remove", method("remove", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), &remove, true)),
-	make_pair("size", method("size", vector<vector<Token>> {vector<Token>()}, vector<Token>(), &size, true)),
-	make_pair("contains", method("contains", vector<vector<Token>> {vector<Token>(), vector<Token>()}, vector<Token>(), &contains, true)),
-	make_pair("bash", method("bash", vector<vector<Token>>{vector<Token>()}, vector<Token>(), &ssBash , true)),
-	make_pair("eval", method("eval", vector<vector<Token>>{vector<Token>()}, vector<Token>(), &ssEvaluate , true))
-};
+	make_pair("int", method("int", vector<vector<Token>>{vector<Token>()}, vector<Token>(), &Int, true)),
+	make_pair("float", method("float", vector<vector<Token>>{vector<Token>()}, vector<Token>(), &Float, true)),
+	make_pair("string", method("string", vector<vector<Token>>{vector<Token>()}, vector<Token>(), &String, true)),
+	make_pair("random", method("random", vector<vector<Token>>{vector<Token>(), vector<Token>()}, vector<Token>(), &random, true)),
+	make_pair("append", method("append", vector<vector<Token>>{vector<Token>(), vector<Token>()}, vector<Token>(), &append, true)),
+	make_pair("appendmultiple", method("appendmultiple", vector<vector<Token>>{vector<Token>(), vector<Token>()}, vector<Token>(), &appendmultiple, true)),
+	make_pair("get", method("get", vector<vector<Token>>{vector<Token>(), vector<Token>()}, vector<Token>(), &get, true)),
+	make_pair("set", method("set", vector<vector<Token>>{vector<Token>(), vector<Token>(), vector<Token>()}, vector<Token>(), &set, true)),
+	make_pair("remove", method("remove", vector<vector<Token>>{vector<Token>(), vector<Token>()}, vector<Token>(), &remove, true)),
+	make_pair("size", method("size", vector<vector<Token>>{vector<Token>()}, vector<Token>(), &size, true)),
+	make_pair("contains", method("contains", vector<vector<Token>>{vector<Token>(), vector<Token>()}, vector<Token>(), &contains, true)),
+	make_pair("bash", method("bash", vector<vector<Token>>{vector<Token>()}, vector<Token>(), &ssBash, true)),
+	make_pair("eval", method("eval", vector<vector<Token>>{vector<Token>()}, vector<Token>(), &ssEvaluate, true))};

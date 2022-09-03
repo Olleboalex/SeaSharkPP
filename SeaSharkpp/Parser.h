@@ -746,10 +746,12 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, map<st
 				{
 					Token objTok = tokens[cursor - 1];
 					string relevantID = "";
+					string varName = "";
 					if (objTok.ID == "VAR")
 					{
 						if ((*Variables).count(objTok.NAME))
 						{
+							varName = objTok.NAME;
 							objTok = (*Variables)[objTok.NAME];
 						}
 						else
@@ -811,7 +813,11 @@ Token Parse(vector<Token> tokens, unordered_map<string, method>* methods, map<st
 								{
 									if (props[objTok.ID].METHODS[propTok.NAME].SystemMethod)
 									{
-										propTok.EvalStatement.insert(propTok.EvalStatement.begin(), vector<Token>{objTok});
+										// If it is calling a method on a variable then give variable name as first term in method call
+										Token temp;
+										temp.ID = "METHODCOMPLEMENT";
+										temp.stringVal = varName;
+										propTok.EvalStatement.insert(propTok.EvalStatement.begin(), vector<Token>{(varName == "") ? objTok : temp});
 									}
 									unordered_map<string, method> appropMethods = *methods;
 
